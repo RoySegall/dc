@@ -1,0 +1,14 @@
+<?php
+/**
+ * @file
+ * Installing file for Drupal connect publisher.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function dc_publisher_install() {
+  $schema = array();
+
+  return $schema;
+}

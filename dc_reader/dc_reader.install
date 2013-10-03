@@ -1,0 +1,14 @@
+<?php
+/**
+ * @file
+ * Installing file for Drupal connect reader.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function dc_reader_install() {
+  $schema = array();
+
+  return $schema;
+}

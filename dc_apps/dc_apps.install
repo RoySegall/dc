@@ -1,0 +1,14 @@
+<?php
+/**
+ * @file
+ * Installing file for Drupal connect apps.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function dc_apps_schema() {
+  $schema = array();
+
+  return $schema;
+}
