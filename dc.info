@@ -1,2 +1,8 @@
 name = Drupal Connect
-description = Allow external services to pull data from you Drupal instllation.
+description = Allow external services to pull data from you Drupal installation.
+core = 7.x
+
+dependencies[] = entity
+dependencies[] = oauth_common
+
+files[] = includes/DrupalConnectReader.inc
