@@ -124,7 +124,7 @@ class DrupalConnect {
    *
    * @return bool
    */
-  public function VerifyParameters($signature) {
+  public function VerifySignature($signature) {
     // TODO: Fix.
     return $this->signature->check_signature($this->request, $this->consumer, $this->token, $signature);
   }
