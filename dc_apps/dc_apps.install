@@ -27,11 +27,17 @@ function dc_apps_schema() {
         'default' => '',
       ),
       'description' => array(
-        'type' => 'text',
-        'not null' => FALSE,
-        'size' => 'big',
         'description' => 'A description of the application.',
-        'translatable' => TRUE,
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'time' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The unix time stamp the app was created.',
       ),
       'uid' => array(
         'description' => 'The {users}.uid that owns this application.',
@@ -42,38 +48,28 @@ function dc_apps_schema() {
       'status' => array(
         'description' => 'The status of the app.',
         'type' => 'int',
-        'not null' => TRUE,
         'default' => 1,
       ),
       'need' => array(
         'description' => 'The entity types from which the app will fetch the data.',
         'type' => 'blob',
-        'not null' => FALSE,
         'size' => 'big',
         'serialize' => TRUE,
       ),
-      'key' => array(
+      'app_key' => array(
         'description' => 'The key of the app.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
+        'type' => 'text',
       ),
-      'secret' => array(
+      'app_secret' => array(
         'description' => 'The secret of the app.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
+        'type' => 'text',
       ),
-      'site' => array(
+      'app_site' => array(
         'description' => 'The site address which the data will be pulled from.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
+        'type' => 'text',
       ),
     ),
+    'primary key' => array('id'),
   );
 
   return $schema;

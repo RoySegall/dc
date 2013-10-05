@@ -1,0 +1,107 @@
+<?php
+/**
+ * @file
+ * Main module file for the Drupal connect apps module.
+ */
+
+/**
+ * Implements hook_entity_info().
+ */
+function dc_apps_entity_info() {
+  return array(
+    'dc_app' => array(
+      'label' => t('Drupal connect apps'),
+      'entity class' => 'DrupalConnectApps',
+      'controller class' => 'EntityAPIController',
+      'base table' => 'dc_apps',
+      'entity keys' => array(
+        'id' => 'id',
+      ),
+    ),
+  );
+}
+
+/**
+ * Create s Drupal connect app entity.
+ *
+ * @param $data
+ *  Initialize data of the Drupal connect app.
+ *
+ * @return DrupalConnectApps
+ *  Initialized object a Drupal connect app.
+ */
+function dc_apps_create($data = array()) {
+  global $user;
+  $data += array(
+    'uid' => $user->uid,
+    'time' => REQUEST_TIME,
+    'status' => 1,
+  );
+
+  return entity_create('dc_app', $data);
+}
+
+/**
+ * Load multiple Drupal connect app entity.
+ *
+ * @param $ids
+ *  Array if Drupal connect apps IDs.
+ *
+ * @return DrupalConnectApps[]
+ *  Array of Drupal connect apps objects.
+ */
+function dc_apps_load_multiple($ids) {
+  return entity_load('dc_app', $ids);
+}
+
+/**
+ * Load a single Drupal connect app entity.
+ *
+ * @param $id
+ *  Id a Drupal connect app entity.
+ *
+ * @return DrupalConnectApps
+ *  Drupal connect apps object.
+ */
+function dc_apps_load($id) {
+ return entity_load_single('dc_app', $id);
+}
+
+/**
+ * Delete multiple Drupal connect app entity.
+ *
+ * @param $ids
+ *  List of Drupal connect app IDs to delete.
+ */
+function dc_apps_delete_multiple($ids) {
+  entity_delete_multiple('dc_app', $ids);
+}
+
+/**
+ * Implements hook_menu().
+ */
+function dc_apps_menu() {
+  $items = array();
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function dc_apps_permission() {
+  return array();
+}
+
+/**
+ * Load app entity by key and secret.
+ *
+ * @param $key
+ *  The key of the app.
+ * @param $secret
+ *  The secret key of the app.
+ *
+ * @return DrupalConnectApps
+ */
+function dc_apps_load_by_keys($key, $secret) {
+}
