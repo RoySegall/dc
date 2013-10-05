@@ -119,6 +119,7 @@ function dc_apps_permission() {
     'delete app' => array(),
     'can approve app' => array(),
     'manage apps' => array(),
+    'manage settings' => array(),
   );
 }
 
