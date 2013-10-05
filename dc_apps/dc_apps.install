@@ -10,5 +10,71 @@
 function dc_apps_schema() {
   $schema = array();
 
+  $schema['dc_apps'] = array(
+    'description' => 'Holds the information for the Drupal connect applications.',
+    'fields' => array(
+      'id' => array(
+        'description' => 'The primary identifier for a applications.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'description' => 'The title of this application.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'description' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'size' => 'big',
+        'description' => 'A description of the application.',
+        'translatable' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'The {users}.uid that owns this application.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'The status of the app.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'need' => array(
+        'description' => 'The entity types from which the app will fetch the data.',
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+      ),
+      'key' => array(
+        'description' => 'The key of the app.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'secret' => array(
+        'description' => 'The secret of the app.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'site' => array(
+        'description' => 'The site address which the data will be pulled from.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+  );
+
   return $schema;
 }
