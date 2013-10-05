@@ -83,14 +83,43 @@ function dc_apps_delete_multiple($ids) {
 function dc_apps_menu() {
   $items = array();
 
+  $items['admin/apps'] = array(
+    'title' => 'Apps',
+    'description' => 'Create/edit/delete apps',
+    'access callback' => 'dc_apps_access_main_app_page',
+    'page callback' => array('dc_apps_main_app_page'),
+  );
+
+  $items['admin/apps/settings'] = array();
+  $items['admin/apps/add'] = array();
+  $items['admin/apps/%dc_app'] = array();
+  $items['admin/apps/%dc_app/edit'] = array();
+  $items['admin/apps/%dc_app/delete'] = array();
+  $items['admin/apps/%dc_app/devel'] = array();
+  $items['admin/apps/%dc_app/stats'] = array();
+  $items['admin/apps/%dc_app/documentation'] = array();
+
   return $items;
+}
+
+/**
+ * Access callback - determine if the user has access to the main app page.
+ */
+function dc_apps_access_main_app_page($account = NULL) {
+  return TRUE;
 }
 
 /**
  * Implements hook_permission().
  */
 function dc_apps_permission() {
-  return array();
+  return array(
+    'create app' => array(),
+    'edit app' => array(),
+    'delete app' => array(),
+    'can approve app' => array(),
+    'manage apps' => array(),
+  );
 }
 
 /**
@@ -104,4 +133,11 @@ function dc_apps_permission() {
  * @return DrupalConnectApps
  */
 function dc_apps_load_by_keys($key, $secret) {
+}
+
+/**
+ * Display the main page of the apps.
+ */
+function dc_apps_main_app_page() {
+  return '';
 }
