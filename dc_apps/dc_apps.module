@@ -88,6 +88,19 @@ function dc_apps_menu() {
     'description' => 'Create/edit/delete apps',
     'access callback' => 'dc_apps_access_main_app_page',
     'page callback' => array('dc_apps_main_app_page'),
+    'file' => 'dc_apps.misc.inc',
+    'file path' => drupal_get_path('module', 'dc_apps') . '/pages/'
+  );
+
+  $items['admin/apps/add'] = array(
+    'title' => 'Create app',
+    'description' => 'Add an app',
+    'access arguments' => array('create app'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dc_app_add_app'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'dc_apps.misc.inc',
+    'file path' => drupal_get_path('module', 'dc_apps') . '/pages/'
   );
 
   $items['admin/apps/settings'] = array();
@@ -104,6 +117,8 @@ function dc_apps_menu() {
 
 /**
  * Access callback - determine if the user has access to the main app page.
+ *
+ * TODO: Fix.
  */
 function dc_apps_access_main_app_page($account = NULL) {
   return TRUE;
@@ -114,7 +129,10 @@ function dc_apps_access_main_app_page($account = NULL) {
  */
 function dc_apps_permission() {
   return array(
-    'create app' => array(),
+    'create app' => array(
+      'title' => t('Create an app'),
+      'description' => t('Allow the user a permission to create an app.'),
+    ),
     'edit app' => array(),
     'delete app' => array(),
     'can approve app' => array(),
@@ -136,9 +154,3 @@ function dc_apps_permission() {
 function dc_apps_load_by_keys($key, $secret) {
 }
 
-/**
- * Display the main page of the apps.
- */
-function dc_apps_main_app_page() {
-  return '';
-}
