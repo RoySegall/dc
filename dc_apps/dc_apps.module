@@ -86,21 +86,21 @@ function dc_apps_menu() {
   $items['admin/apps'] = array(
     'title' => 'Apps',
     'description' => 'Create/edit/delete apps',
-    'access callback' => 'dc_apps_access_main_app_page',
     'page callback' => array('dc_apps_main_app_page'),
+    'access callback' => 'dc_apps_access_main_app_page',
     'file' => 'dc_apps.misc.inc',
-    'file path' => drupal_get_path('module', 'dc_apps') . '/pages/'
+    'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
   );
 
-  $items['admin/apps/add'] = array(
+  $items['admin/apps/add-app'] = array(
     'title' => 'Create app',
     'description' => 'Add an app',
+    'type' => MENU_LOCAL_ACTION,
     'access arguments' => array('create app'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('dc_app_add_app'),
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'dc_apps.misc.inc',
-    'file path' => drupal_get_path('module', 'dc_apps') . '/pages/'
+    'page arguments' => array('dc_apps_app_form'),
+    'file' => 'dc_apps.crud.inc',
+    'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
   );
 
   $items['admin/apps/settings'] = array();
@@ -141,6 +141,7 @@ function dc_apps_permission() {
   );
 }
 
+
 /**
  * Load app entity by key and secret.
  *
@@ -152,5 +153,30 @@ function dc_apps_permission() {
  * @return DrupalConnectApps
  */
 function dc_apps_load_by_keys($key, $secret) {
+}
+
+/**
+ * Build a list of fields for an entity.
+ *
+ * @param $entity
+ *  The entity name.
+ *
+ * @return Array
+ *  List of fields.
+ */
+function dc_apps_build_fields($entity) {
+  $field_instances = field_info_instances($entity);
+  $fields_lists = array();
+
+  foreach ($field_instances as $bundle => $fields) {
+    foreach ($fields as $name => $field) {
+      $content_type_info = node_type_get_type($bundle);
+
+      $fields_lists[$name] = $field['label'];
+      $fields_lists[$name] .= $content_type_info ? " (" . $content_type_info->name . ")" : '';
+    }
+  }
+
+  return $fields_lists;
 }
 
