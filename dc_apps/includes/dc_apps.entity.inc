@@ -61,4 +61,20 @@ class DrupalConnectApps extends Entity {
    * The site address which the data will be pulled from.
    */
   public $app_site;
+
+  /**
+   * Overrides save().
+   */
+  public function save() {
+    // Before saving verify the user did not changed the key and secret keys.
+    parent::save();
+  }
+
+  /**
+   * Generate key and secret keys for a new application.
+   *
+   * @TODO: Find a way how?!
+   */
+  public function generateKeyAndSecret() {
+  }
 }

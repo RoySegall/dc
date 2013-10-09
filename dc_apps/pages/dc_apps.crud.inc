@@ -15,8 +15,9 @@ function dc_apps_app_form($form, &$form_state, $app = NULL) {
 
   $form['title'] = array(
     '#type' => 'textfield',
-    '#title' => t('title'),
+    '#title' => t('Title'),
     '#description' => t('The name of the application.'),
+    '#required' => TRUE,
   );
 
   $form['description'] = array(
@@ -39,7 +40,7 @@ function dc_apps_app_form($form, &$form_state, $app = NULL) {
       '#type' => 'select',
       '#title' => t('Search by'),
       '#description' => t('Select the field/property on which apps can make a search.'),
-      '#options' => $info['schema_fields_sql']['base table'] + dc_apps_build_fields($name),
+      '#options' => dc_apps_build_fields($name),
       '#states' => array(
         'visible' => array(
           ':input[name="' . $name . '_need"]' => array('checked' => TRUE),
@@ -135,10 +136,41 @@ function dc_apps_app_form($form, &$form_state, $app = NULL) {
  * Validate handler.
  */
 function dc_apps_app_form_validate($form, $form_state) {
+  field_attach_form_validate('dc_app', $form_state['#entity'], $form, $form_state);
 }
 
 /**
  * Submit handler.
  */
-function dc_apps_app_form_submit($form, $form_state) {
+function dc_apps_app_form_submit($form, &$form_state) {
+  /** @var DrupalConnectApps $app */
+  $app = $form_state['#entity'];
+  $values = $form_state['values'];
+
+  // Star building information about entity.
+  $entities = array_keys(entity_get_info());
+  $need = array();
+
+  foreach ($entities as $entity) {
+    if (!$values[$entity . '_need']) {
+      // We don't need to store information for not needed entities.
+      continue;
+    }
+    $need[$entity] = array(
+      'search' => $values[$entity . '_search'],
+      'operator' => $values[$entity . '_operator'],
+    );
+  }
+
+  // Building the entity object.
+  $app->title = $values['title'];
+  $app->description = $values['description'];
+  $app->need = $need;
+  $app->uid = user_load_by_name($values['name'])->uid;
+  $app->app_site = $values['site'];
+  $app->generateKeyAndSecret();
+  $app->save();
+
+  // Display message and redirect the user back to .
+  $form_state['redirect'] = 'admin/apps';
 }

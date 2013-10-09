@@ -156,7 +156,7 @@ function dc_apps_load_by_keys($key, $secret) {
 }
 
 /**
- * Build a list of fields for an entity.
+ * Build a list of properties and fields for an entity.
  *
  * @param $entity
  *  The entity name.
@@ -165,18 +165,27 @@ function dc_apps_load_by_keys($key, $secret) {
  *  List of fields.
  */
 function dc_apps_build_fields($entity) {
+  $schema_info = array();
+
+  // Get the schema fields.
+  $info = entity_get_info($entity);
+
+  foreach ($info['schema_fields_sql']['base table'] as $property) {
+    $schema_info[$property] = ucfirst(str_replace('_', ' ', $property));
+  }
+
+  // Get the fields names.
   $field_instances = field_info_instances($entity);
-  $fields_lists = array();
 
   foreach ($field_instances as $bundle => $fields) {
     foreach ($fields as $name => $field) {
       $content_type_info = node_type_get_type($bundle);
 
-      $fields_lists[$name] = $field['label'];
-      $fields_lists[$name] .= $content_type_info ? " (" . $content_type_info->name . ")" : '';
+      $schema_info[$name] = $field['label'];
+      $schema_info[$name] .= $content_type_info ? " (" . $content_type_info->name . ")" : '';
     }
   }
 
-  return $fields_lists;
+  return $schema_info;
 }
 
