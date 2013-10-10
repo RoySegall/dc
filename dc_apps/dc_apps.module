@@ -133,14 +133,28 @@ function dc_apps_permission() {
       'title' => t('Create an app'),
       'description' => t('Allow the user a permission to create an app.'),
     ),
-    'edit app' => array(),
-    'delete app' => array(),
-    'can approve app' => array(),
-    'manage apps' => array(),
-    'manage settings' => array(),
+    'edit app' => array(
+      'title' => t('Edit app'),
+      'description' => t('Allow to the user edit an app.'),
+    ),
+    'delete app' => array(
+      'title' => t('Delete pp'),
+      'description' => t('Allow to the user delete an app.'),
+    ),
+    'can approve app' => array(
+      'title' => t('Can approve app'),
+      'description' => t('When apps need to be approved, the user can approve apps.'),
+    ),
+    'manage apps' => array(
+      'title' => t('Manage app'),
+      'description' => t('Grant to the user manage apps. Give this to trusty users.'),
+    ),
+    'manage settings' => array(
+      'title' => t('Manage settings'),
+      'description' => t('Allow to user manage the settings of Drupal connect apps. Give this to trusty users.'),
+    ),
   );
 }
-
 
 /**
  * Load app entity by key and secret.
