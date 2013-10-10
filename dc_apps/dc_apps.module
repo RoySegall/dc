@@ -92,7 +92,7 @@ function dc_apps_menu() {
     'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
   );
 
-  $items['admin/apps/add-app'] = array(
+  $items['admin/apps/add'] = array(
     'title' => 'Create app',
     'description' => 'Add an app',
     'type' => MENU_LOCAL_ACTION,
@@ -103,15 +103,25 @@ function dc_apps_menu() {
     'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
   );
 
-  $items['admin/apps/settings'] = array();
-  $items['admin/apps/add'] = array();
   $items['admin/apps/%dc_app'] = array();
   $items['admin/apps/%dc_app/edit'] = array();
   $items['admin/apps/%dc_app/delete'] = array();
-  $items['admin/apps/%dc_app/devel'] = array();
   $items['admin/apps/%dc_app/stats'] = array();
   $items['admin/apps/%dc_app/documentation'] = array();
 
+  if (module_exists('devel')) {
+    $items['admin/apps/%dc_app/devel'] = array();
+  }
+
+  $items['admin/config/services/apps-settings'] = array(
+    'title' => 'Drupal connect apps',
+    'description' => 'Manage Drupal connect apps',
+    'access arguments' => array('manage settings'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dc_apps_settings'),
+    'file' => 'dc_apps.misc.inc',
+    'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
+  );
   return $items;
 }
 
