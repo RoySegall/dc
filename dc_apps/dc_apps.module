@@ -116,11 +116,20 @@ function dc_apps_menu() {
     'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
   );
 
-  $items['admin/apps/%dc_app/delete'] = array();
+  $items['admin/apps/%dc_apps/delete'] = array(
+    'title' => 'Delete app',
+    'description' => 'Delete an app.',
+    'access callback' => 'dc_apps_access',
+    'access arguments' => array('delete', 2),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dc_apps_app_delete', 2),
+    'file' => 'dc_apps.crud.inc',
+    'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
+  );
 
-  $items['admin/apps/%dc_app/stats'] = array();
+  $items['admin/apps/%dc_apps/stats'] = array();
 
-  $items['admin/apps/%dc_app/documentation'] = array();
+  $items['admin/apps/%dc_apps/documentation'] = array();
 
   if (module_exists('devel')) {
     $items['admin/apps/%dc_app/devel'] = array();

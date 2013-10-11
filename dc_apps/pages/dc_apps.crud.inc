@@ -222,3 +222,26 @@ function dc_apps_app_form_submit($form, &$form_state) {
   // Display message and redirect the user back to .
   $form_state['redirect'] = 'admin/apps';
 }
+
+/**
+ * Ask the user if he wan't to delete the app.
+ */
+function dc_apps_app_delete($form, &$form_state, DrupalConnectApps $app) {
+  $form_state['#entity'] = $app;
+  return confirm_form($form,
+    t('Are you sure you want to delete %title?', array('%title' => $app->title)),
+    'admin/apps',
+    t('This action cannot be undone.'),
+    t('Delete'),
+    t('Cancel')
+  );
+}
+
+/**
+ * Deleting the app.
+ */
+function dc_apps_app_delete_submit($form, $form_state) {
+  // Delete.
+
+  // Show message.
+}
