@@ -7,7 +7,7 @@
 /**
  * Manage an app entity.
  */
-function dc_apps_app_form($form, &$form_state, $app = NULL) {
+function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
   if (!$app) {
     $app = dc_apps_create();
   }
@@ -18,17 +18,21 @@ function dc_apps_app_form($form, &$form_state, $app = NULL) {
     '#title' => t('Title'),
     '#description' => t('The name of the application.'),
     '#required' => TRUE,
+    '#default_value' => $app->title,
   );
 
   $form['description'] = array(
     '#type' => 'textfield',
     '#title' => t('Description'),
     '#description' => t('The description of the application'),
+    '#default_value' => $app->description,
   );
 
   // Get the entities and sort them in alphabetical order.
   $entities = entity_get_info();
   ksort($entities);
+
+  dpm($app->need);
 
   foreach ($entities as $name => $info) {
     $form['need'][$name][$name . '_need'] = array(

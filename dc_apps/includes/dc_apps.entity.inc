@@ -71,6 +71,29 @@ class DrupalConnectApps extends Entity {
   }
 
   /**
+   * Generating links of the app.
+   *
+   * @param $action
+   *  The type of the actions: edit, delete or documentation.
+   * @param $account
+   *  The account user. This will take care of permissions.
+   *
+   * @return String
+   *  The link for the action.
+   *
+   * TODO: Add alter hook, Take care of permission.
+   */
+  public function generateLink($action, $account = NULL) {
+    $actions = array(
+      'edit' => t('Edit'),
+      'delete' => t('Delete'),
+      'documentation' => t('Documentation'),
+    );
+
+    return l($actions[$action], 'admin/apps/' . $this->id . '/' . $action);
+  }
+
+  /**
    * Generate key and secret keys for a new application.
    *
    * @TODO: Find a way how?!

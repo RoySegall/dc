@@ -104,9 +104,22 @@ function dc_apps_menu() {
   );
 
   $items['admin/apps/%dc_app'] = array();
-  $items['admin/apps/%dc_app/edit'] = array();
+
+  $items['admin/apps/%dc_apps/edit'] = array(
+    'title' => 'Edit app',
+    'description' => 'Edit the app settings',
+    'access callback' => 'dc_apps_access',
+    'access arguments' => array('edit', 2),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dc_apps_app_form', 2),
+    'file' => 'dc_apps.crud.inc',
+    'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
+  );
+
   $items['admin/apps/%dc_app/delete'] = array();
+
   $items['admin/apps/%dc_app/stats'] = array();
+
   $items['admin/apps/%dc_app/documentation'] = array();
 
   if (module_exists('devel')) {
@@ -122,7 +135,21 @@ function dc_apps_menu() {
     'file' => 'dc_apps.misc.inc',
     'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
   );
+
   return $items;
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function dc_apps_admin_paths() {
+  return array(
+    'admin/apps' => TRUE,
+    'admin/apps/add' => TRUE,
+    'admin/apps/apps/*' => TRUE,
+    'admin/apps/apps/edit/*' => TRUE,
+    'admin/apps/apps/delete/*' => TRUE,
+  );
 }
 
 /**
@@ -131,6 +158,13 @@ function dc_apps_menu() {
  * TODO: Fix.
  */
 function dc_apps_access_main_app_page($account = NULL) {
+  return TRUE;
+}
+
+/**
+ * Access callback for action on app.
+ */
+function dc_apps_access($access, DrupalConnectApps $app) {
   return TRUE;
 }
 

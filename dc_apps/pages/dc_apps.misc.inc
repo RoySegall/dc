@@ -18,7 +18,8 @@ function dc_apps_main_app_page() {
     array('data' => t('App name'), 'width' => '40%'),
     array('data' => t('Information'), 'width' => '40%'),
     array('data' => t('Options')),
-  );;
+  );
+
   $rows = array();
 
   foreach ($apps as $app) {
@@ -28,27 +29,16 @@ function dc_apps_main_app_page() {
       '@site' => $app->app_site,
     );
 
-    $links = array();
-    $links[] = array(
-      'href'  => 'node/',
-      'title' => t('Edit'),
-    );
-
-    $links[] = array(
-      'href'  => 'node/',
-      'title' => t('Delete'),
-    );
-
-    $links[] = array(
-      'href'  => 'node/',
-      'title' => t('Documentation'),
-    );
+    $items = array();
+    $items[] = $app->generateLink('edit');
+    $items[] = $app->generateLink('delete');
+    $items[] = $app->generateLink('documentation');
 
     $rows[] = array(
       $app->title . '<br />' . $app->description,
       t('Key: @key<br />Secret: @secret<br />Site: @site', $params),
-      theme('links', array(
-        'links' => $links,
+      theme('item_list', array(
+        'items' => $items,
         'attributes' => array('class' => array('links', 'inline')),
       )),
     );
