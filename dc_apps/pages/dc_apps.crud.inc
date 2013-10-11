@@ -143,6 +143,25 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
  * Validate handler.
  */
 function dc_apps_app_form_validate($form, $form_state) {
+  // App name should be only in english.
+  if (preg_match('/[^A-Za-z0-9]/', $form_state['values']['title'])) {
+    form_set_error('title', t('The name of the app should be only in english.'));
+  }
+
+  // The app must user at least one entity.
+  $entities = array_keys(entity_get_info());
+  $entity_selected = FALSE;
+  foreach ($entities as $entity) {
+    if ($form_state['values'][$entity . '_need']) {
+      $entity_selected = TRUE;
+      break;
+    }
+  }
+
+  if (!$entity_selected) {
+    form_set_error('', t('A basic must use at least one entity.'));
+  }
+
   field_attach_form_validate('dc_app', $form_state['#entity'], $form, $form_state);
 }
 
@@ -163,6 +182,7 @@ function dc_apps_app_form_submit($form, &$form_state) {
       // We don't need to store information for not needed entities.
       continue;
     }
+
     $need[$entity] = array(
       'search' => $values[$entity . '_search'],
       'operator' => $values[$entity . '_operator'],
@@ -178,11 +198,26 @@ function dc_apps_app_form_submit($form, &$form_state) {
 
   // Generating secret and public for the entity.
   if (!empty($app->is_new)) {
+    $op = 'created';
     $app->generateKeyAndSecret();
+  }
+  else {
+    $op = 'updated';
   }
 
   // Update/save the entity.
   $app->save();
+
+  // Showing messages.
+  $params = array(
+    '@name' => $app->title,
+    '@op' => $op,
+  );
+  drupal_set_message(t('The app @name has @op successful.', $params));
+
+  if (!empty($app->need['user'])) {
+    drupal_set_message(t('Your app need the user information. This could be achieved only when the user approve the app.'), 'warning');
+  }
 
   // Display message and redirect the user back to .
   $form_state['redirect'] = 'admin/apps';

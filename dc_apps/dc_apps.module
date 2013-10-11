@@ -147,8 +147,9 @@ function dc_apps_admin_paths() {
     'admin/apps' => TRUE,
     'admin/apps/add' => TRUE,
     'admin/apps/apps/*' => TRUE,
-    'admin/apps/apps/edit/*' => TRUE,
-    'admin/apps/apps/delete/*' => TRUE,
+    'admin/apps/apps/*/edit' => TRUE,
+    'admin/apps/apps/*/devel' => TRUE,
+    'admin/apps/apps/*/delete' => TRUE,
   );
 }
 
