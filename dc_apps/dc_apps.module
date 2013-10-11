@@ -168,6 +168,21 @@ function dc_apps_admin_paths() {
  * TODO: Fix.
  */
 function dc_apps_access_main_app_page($account = NULL) {
+  if (!$account) {
+    global $user;
+    $account = user_load($user->uid);
+  }
+
+  $permissions = array(
+    'manage apps', 'edit app', 'delete app',
+  );
+
+  foreach ($permissions as $permission) {
+    if (!user_access($permission, $account)) {
+      return FALSE;
+    }
+  }
+
   return TRUE;
 }
 
