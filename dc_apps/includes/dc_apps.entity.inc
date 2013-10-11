@@ -80,24 +80,35 @@ class DrupalConnectApps extends Entity {
    *
    * @return String
    *  The link for the action.
-   *
-   * TODO: Add alter hook, Take care of permission.
    */
   public function generateLink($action, $account = NULL) {
     $actions = array(
-      'edit' => t('Edit'),
-      'delete' => t('Delete'),
-      'documentation' => t('Documentation'),
+      'edit' => array(
+        'title' => t('Edit'),
+        'href' => 'admin/apps/' . $this->id . '/edit',
+      ),
+      'delete' => array(
+        'title' => t('Delete'),
+        'href' => 'admin/apps/' . $this->id . '/delete',
+      ),
+      'documentation' => array(
+        'title' => t('Documentation'),
+        'href' => 'admin/apps/' . $this->id . '/documentation',
+      ),
     );
 
-    return l($actions[$action], 'admin/apps/' . $this->id . '/' . $action);
+    drupal_alter('dc_apps_generate_links_action_alter', $actions);
+
+    return l($actions[$action]['title'], $actions[$action]['href']);
   }
 
   /**
    * Generate key and secret keys for a new application.
-   *
-   * @TODO: Find a way how?!
    */
   public function generateKeyAndSecret() {
+    $user = user_load($this->uid);
+
+    $this->app_key = str_replace(array(' ', '', '-'), '_', strtolower($this->title));
+    $this->app_secret = md5($user->name . $this->time);
   }
 }
