@@ -32,12 +32,13 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
   $entities = entity_get_info();
   ksort($entities);
 
-  dpm($app->need);
-
   foreach ($entities as $name => $info) {
+    $need_info = empty($app->need[$name]) ? array() : $app->need[$name];
+
     $form['need'][$name][$name . '_need'] = array(
       '#type' => 'checkbox',
       '#title' => $info['label'],
+      '#default_value' => empty($need_info) ? FALSE : TRUE,
     );
 
     $form['need'][$name][$name . '_search'] = array(
@@ -45,6 +46,7 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
       '#title' => t('Search by'),
       '#description' => t('Select the field/property on which apps can make a search.'),
       '#options' => dc_apps_build_fields($name),
+      '#default_value' => empty($need_info['search']) ? '' : $need_info['search'],
       '#states' => array(
         'visible' => array(
           ':input[name="' . $name . '_need"]' => array('checked' => TRUE),
@@ -56,6 +58,7 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
       '#type' => 'select',
       '#title' => t('Operator'),
       '#description' => t('What the operator you would like to apply?'),
+      '#default_value' => empty($need_info['operator']) ? '' : $need_info['operator'],
       '#options' => array(
         '=' => '=',
         '%LIKE%' => t('Like'),
@@ -172,7 +175,13 @@ function dc_apps_app_form_submit($form, &$form_state) {
   $app->need = $need;
   $app->uid = user_load_by_name($values['name'])->uid;
   $app->app_site = $values['site'];
-  $app->generateKeyAndSecret();
+
+  // Generating secret and public for the entity.
+  if (!empty($app->is_new)) {
+    $app->generateKeyAndSecret();
+  }
+
+  // Update/save the entity.
   $app->save();
 
   // Display message and redirect the user back to .
