@@ -144,7 +144,7 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
  */
 function dc_apps_app_form_validate($form, $form_state) {
   // App name should be only in english.
-  if (preg_match('/[^A-Za-z0-9]/', $form_state['values']['title'])) {
+  if (preg_match('/[^A-Za-z0-9 ]/', $form_state['values']['title'])) {
     form_set_error('title', t('The name of the app should be only in english.'));
   }
 
@@ -240,8 +240,13 @@ function dc_apps_app_delete($form, &$form_state, DrupalConnectApps $app) {
 /**
  * Deleting the app.
  */
-function dc_apps_app_delete_submit($form, $form_state) {
+function dc_apps_app_delete_submit($form, &$form_state) {
   // Delete.
+  $form_state['#entity']->delete();
 
   // Show message.
+  drupal_set_message(t('The app @name has deleted sucesfully', array('@name' => $form_state['#entity']->title)));
+
+  // Redirect user.
+  $form_state['redirect'] = 'admin/apps';
 }

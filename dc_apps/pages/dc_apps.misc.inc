@@ -12,7 +12,11 @@ function dc_apps_main_app_page() {
   $result = $query
     ->entityCondition('entity_type', 'dc_app')
     ->execute();
-  $apps = dc_apps_load_multiple(array_keys($result['dc_app']));
+
+  $apps = array();
+  if (!empty($result['dc_app'])) {
+    $apps = dc_apps_load_multiple(array_keys($result['dc_app']));
+  }
 
   $header = array(
     array('data' => t('App name'), 'width' => '40%'),
@@ -22,26 +26,31 @@ function dc_apps_main_app_page() {
 
   $rows = array();
 
-  foreach ($apps as $app) {
-    $params = array(
-      '@key' => $app->app_key,
-      '@secret' => $app->app_secret,
-      '@site' => $app->app_site,
-    );
+  if ($apps) {
+    foreach ($apps as $app) {
+      $params = array(
+        '@key' => $app->app_key,
+        '@secret' => $app->app_secret,
+        '@site' => $app->app_site,
+      );
 
-    $items = array();
-    $items[] = $app->generateLink('edit');
-    $items[] = $app->generateLink('delete');
-    $items[] = $app->generateLink('documentation');
+      $items = array();
+      $items[] = $app->generateLink('edit');
+      $items[] = $app->generateLink('delete');
+      $items[] = $app->generateLink('documentation');
 
-    $rows[] = array(
-      $app->title . '<br />' . $app->description,
-      t('Key: @key<br />Secret: @secret<br />Site: @site', $params),
-      theme('item_list', array(
-        'items' => $items,
-        'attributes' => array('class' => array('links', 'inline')),
-      )),
-    );
+      $rows[] = array(
+        $app->title . '<br />' . $app->description,
+        t('Key: @key<br />Secret: @secret<br />Site: @site', $params),
+        theme('item_list', array(
+          'items' => $items,
+          'attributes' => array('class' => array('links', 'inline')),
+        )),
+      );
+    }
+  }
+  else {
+    $rows[] = array(array('data' => t('No apps were found.'), 'colspan' => 3));
   }
 
   $table = array(
