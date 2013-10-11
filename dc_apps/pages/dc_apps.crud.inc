@@ -115,7 +115,7 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
   $form['oauth']['secret'] = array(
     '#type' => 'item',
     '#title' => t('Secret'),
-    '#markup' => $app->app_key ? $app->app_key : t('Need be generated'),
+    '#markup' => $app->app_secret ? $app->app_secret : t('Need be generated'),
   );
 
   $form['oauth']['site'] = array(
