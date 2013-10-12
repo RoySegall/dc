@@ -1,0 +1,72 @@
+<?php
+/**
+ * @file
+ * Main file of the module Drupal connect publisher.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function dc_publisher_menu() {
+  $items = array();
+
+  $items['admin/apps/%dc_apps/documentation'] = array(
+    'title' => 'Documentation',
+    'description' => 'View documentation of an app',
+    'access arguments' => array('view documentation'),
+    'page callback' => 'dc_publisher_documentation',
+  );
+
+  $items['publisher'] = array(
+    'title' => 'Publisher',
+    'description' => 'Supplying JSON information for an app',
+    'access callback' => 'dc_publisher_oatuh_allowed',
+    'page callback' => 'dc_publisher_supply_information',
+  );
+
+  $items['apps/%dc_apps/user_approve_app'] = array(
+    'title' => 'Approve app',
+    'description' => 'Allow to user approve app',
+    'access callback' => TRUE,
+    'page callback' => 'dc_apps_user_approve_app',
+    'page arguments' => array(1),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function dc_publisher_permission() {
+  return array(
+    'view documentation' => array(
+      'title' => t('View documentation'),
+      'description' => t('Allow to the user watch the documentation of an app.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_dc_apps_generate_links_action_alter().
+ */
+function dc_publisher_dc_apps_generate_links_action_alter(&$actions, DrupalConnectApps $app) {
+  $actions['documentation'] = array(
+    'title' => t('Documentation'),
+    'href' => 'admin/apps/' . $app->id . '/documentation',
+  );
+}
+
+/**
+ * Implements hook_dc_apps_app_options_alter().
+ */
+function dc_publisher_dc_apps_app_options_alter(&$items, DrupalConnectApps $app) {
+  $items[] = $app->generateLink('documentation');
+}
+
+/**
+ * Display documentation for an app.
+ */
+function dc_publisher_documentation() {
+  return '';
+}
