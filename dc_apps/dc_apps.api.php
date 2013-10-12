@@ -45,3 +45,26 @@ function hook_dc_apps_generate_links_action_alter(&$actions) {
 function hook_dc_apps_app_options_alter(&$items, DrupalConnectApps $app) {
   $items[] = $app->generateLink('new_action');
 }
+
+/**
+ * Implements hook_dc_apps_access().
+ *
+ * Allow other module to grant action for a specific action. This will consider
+ * if other modules has different logic for access permission which are not edit
+ * or delete or just want to bypass the dc_apps_access function.
+ *
+ * The hook_dc_apps_access() need to return TRUE or FALSE.
+ * @see hook_node_access().
+ *
+ * @param $access
+ *  The access name.
+ * @param DrupalConnectApps $app
+ *  The app object
+ * @param $account
+ *  The loaded user account.
+ *
+ * @return bool
+ *  Need to return TRUE/FALSE.
+ */
+function hook_dc_apps_access($access, DrupalConnectApps $app, $account) {
+}

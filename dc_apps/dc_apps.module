@@ -158,8 +158,6 @@ function dc_apps_admin_paths() {
 
 /**
  * Access callback - determine if the user has access to the main app page.
- *
- * TODO: Fix.
  */
 function dc_apps_access_main_app_page($account = NULL) {
   if (!$account) {
@@ -168,7 +166,7 @@ function dc_apps_access_main_app_page($account = NULL) {
   }
 
   $permissions = array(
-    'manage apps', 'edit app', 'delete app',
+    'manage apps', 'edit app', 'edit own app', 'delete app', 'delete own app',
   );
 
   foreach ($permissions as $permission) {
@@ -182,9 +180,37 @@ function dc_apps_access_main_app_page($account = NULL) {
 
 /**
  * Access callback for action on app.
+ *
+ * @param $access
+ *  The access name.
+ * @param DrupalConnectApps $app
+ *  The app object
+ * @param $account
+ *  The user ID.
+ *
+ * @return bool
+ *  Return true or false if the user has access for this action.
  */
-function dc_apps_access($access, DrupalConnectApps $app) {
-  return TRUE;
+function dc_apps_access($access, DrupalConnectApps $app, $account = NULL) {
+  if (!$account) {
+    global $user;
+    $account = user_load($user->uid);
+  }
+
+  $edit_permission = $access;
+  if ($account->uid == $app->uid) {
+    $edit_permission .= ' own';
+  }
+  $edit_permission .= ' app';
+
+  // Collect access information from other modules. See first if other modules
+  // allowed this action. Only TRUE will accepted.
+  $invoked_access = module_invoke_all('dc_apps_access', $access, $app, $account);
+  if (in_array(TRUE, $invoked_access, TRUE)) {
+    return TRUE;
+  }
+
+  return user_access($edit_permission, $account);
 }
 
 /**
@@ -236,6 +262,8 @@ function dc_apps_permission() {
  *  The secret key of the app.
  *
  * @return DrupalConnectApps
+ *
+ * @TODO: Use EntityFieldQuery().
  */
 function dc_apps_load_by_keys($key, $secret) {
 }
