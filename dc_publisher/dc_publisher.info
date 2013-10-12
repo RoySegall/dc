@@ -2,5 +2,6 @@ name = Drupal connect publisher
 description = Send the information from your site to the requester after verification.
 core = 7.x
 
+dependencies[] = dc_apps
 dependencies[] = entity
 dependencies[] = oauth_common
