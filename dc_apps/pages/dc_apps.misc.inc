@@ -38,6 +38,10 @@ function dc_apps_main_app_page() {
       $items[] = $app->generateLink('edit');
       $items[] = $app->generateLink('delete');
 
+      if (!$app->status) {
+        $items[] = $app->generateLink('approve');
+      }
+
       // Let other module add their own links.
       drupal_alter('dc_apps_app_options', $items, $app);
 
@@ -68,5 +72,13 @@ function dc_apps_main_app_page() {
  * Settings for the Drupal connect apps.
  */
 function dc_apps_settings($form, $form_state) {
-  return $form;
+
+  $form['apps_need_approve'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Apps need to be approve?'),
+    '#description' => t('When apps are created they approve autocratically. You can turn this off by checking the box.'),
+    '#default_value' => variable_get('apps_need_approve', FALSE),
+  );
+
+  return system_settings_form($form);
 }

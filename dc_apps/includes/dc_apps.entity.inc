@@ -91,6 +91,10 @@ class DrupalConnectApps extends Entity {
         'title' => t('Delete'),
         'href' => 'admin/apps/' . $this->id . '/delete',
       ),
+      'approve' => array(
+        'title' => t('Approve app'),
+        'href' => 'admin/apps/' . $this->id . '/approve',
+      ),
     );
 
     drupal_alter('dc_apps_generate_links_action_alter', $actions);

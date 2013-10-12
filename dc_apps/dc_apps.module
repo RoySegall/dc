@@ -32,10 +32,11 @@ function dc_apps_entity_info() {
  */
 function dc_apps_create($data = array()) {
   global $user;
+
   $data += array(
     'uid' => $user->uid,
     'time' => REQUEST_TIME,
-    'status' => 1,
+    'status' => !variable_get('apps_need_approve'),
   );
 
   return entity_create('dc_app', $data);
@@ -125,6 +126,17 @@ function dc_apps_menu() {
     'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
   );
 
+  $items['admin/apps/%dc_apps/approve'] = array(
+    'title' => 'Approve app',
+    'description' => 'Approve an app.',
+    'access callback' => 'dc_apps_approve_app',
+    'access arguments' => array(2),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dc_apps_app_approve', 2),
+    'file' => 'dc_apps.crud.inc',
+    'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
+  );
+
   if (module_exists('devel')) {
     $items['admin/apps/%dc_app/devel'] = array();
   }
@@ -197,6 +209,12 @@ function dc_apps_access($access, DrupalConnectApps $app, $account = NULL) {
     $account = user_load($user->uid);
   }
 
+  // Check if the user can manage apps. The manage apps permission are bypass
+  // any permission.
+  if (user_access('manage apps')) {
+    return TRUE;
+  }
+
   $edit_permission = $access;
   if ($account->uid == $app->uid) {
     $edit_permission .= ' own';
@@ -211,6 +229,33 @@ function dc_apps_access($access, DrupalConnectApps $app, $account = NULL) {
   }
 
   return user_access($edit_permission, $account);
+}
+
+/**
+ * Access callback for approving an app. This will be able in two cases:
+ *  1. The app is disabled.
+ *  2. The user can approve apps.
+ *
+ * @param DrupalConnectApps $app
+ *  The app object.
+ * @param $account
+ *  The account of the user.
+ *
+ * @return bool
+ *  Return TRUE/FALSE if the app can be enabled.
+ */
+function dc_apps_approve_app(DrupalConnectApps $app, $account = NULL) {
+  if (!$account) {
+    global $user;
+    $account = user_load($user->uid);
+  }
+
+  // The app is enabled. Get out!
+  if ($app->status) {
+    return FALSE;
+  }
+
+  return user_access('can approve app', $account) || user_access('manage apps', $account);
 }
 
 /**
