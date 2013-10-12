@@ -103,8 +103,6 @@ function dc_apps_menu() {
     'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
   );
 
-  $items['admin/apps/%dc_app'] = array();
-
   $items['admin/apps/%dc_apps/edit'] = array(
     'title' => 'Edit app',
     'description' => 'Edit the app settings',
@@ -126,10 +124,6 @@ function dc_apps_menu() {
     'file' => 'dc_apps.crud.inc',
     'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
   );
-
-  $items['admin/apps/%dc_apps/stats'] = array();
-
-  $items['admin/apps/%dc_apps/documentation'] = array();
 
   if (module_exists('devel')) {
     $items['admin/apps/%dc_app/devel'] = array();
@@ -202,13 +196,21 @@ function dc_apps_permission() {
       'title' => t('Create an app'),
       'description' => t('Allow the user a permission to create an app.'),
     ),
+    'edit own app' => array(
+      'title' => t('Edit own app'),
+      'description' => t('Allow to the user edit his own app.'),
+    ),
     'edit app' => array(
       'title' => t('Edit app'),
-      'description' => t('Allow to the user edit an app.'),
+      'description' => t('Allow user to edit apps which he not own them.'),
+    ),
+    'delete own app' => array(
+      'title' => t('Delete own app'),
+      'description' => t('Allow to the user delete his app.'),
     ),
     'delete app' => array(
-      'title' => t('Delete pp'),
-      'description' => t('Allow to the user delete an app.'),
+      'title' => t('Delete other app'),
+      'description' => t('Allow to the user delete apps which he not own them.'),
     ),
     'can approve app' => array(
       'title' => t('Can approve app'),
