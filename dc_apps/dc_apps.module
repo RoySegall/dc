@@ -16,6 +16,7 @@ function dc_apps_entity_info() {
       'base table' => 'dc_apps',
       'entity keys' => array(
         'id' => 'id',
+        'label' => 'title',
       ),
     ),
   );
@@ -105,7 +106,7 @@ function dc_apps_menu() {
   );
 
   $items['admin/apps/%dc_apps/edit'] = array(
-    'title' => 'Edit app',
+    'title' => 'Edit',
     'description' => 'Edit the app settings',
     'access callback' => 'dc_apps_access',
     'access arguments' => array('edit', 2),
@@ -113,10 +114,12 @@ function dc_apps_menu() {
     'page arguments' => array('dc_apps_app_form', 2),
     'file' => 'dc_apps.crud.inc',
     'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 0,
   );
 
   $items['admin/apps/%dc_apps/delete'] = array(
-    'title' => 'Delete app',
+    'title' => 'Delete',
     'description' => 'Delete an app.',
     'access callback' => 'dc_apps_access',
     'access arguments' => array('delete', 2),
@@ -124,7 +127,23 @@ function dc_apps_menu() {
     'page arguments' => array('dc_apps_app_delete', 2),
     'file' => 'dc_apps.crud.inc',
     'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
   );
+
+  if (module_exists('devel')) {
+    $items['admin/apps/%dc_apps/devel'] = array(
+      'title' => 'Devel',
+      'page callback' => 'devel_load_object',
+      'page arguments' => array('dc_apps', 2),
+      'access arguments' => array('access devel information'),
+      'type' => MENU_LOCAL_TASK,
+      'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+      'file' => 'devel.pages.inc',
+      'file path' => drupal_get_path('module', 'devel'),
+      'weight' => 20,
+    );
+  }
 
   $items['admin/apps/%dc_apps/approve'] = array(
     'title' => 'Approve app',
@@ -136,10 +155,6 @@ function dc_apps_menu() {
     'file' => 'dc_apps.crud.inc',
     'file path' => drupal_get_path('module', 'dc_apps') . '/pages/',
   );
-
-  if (module_exists('devel')) {
-    $items['admin/apps/%dc_app/devel'] = array();
-  }
 
   $items['admin/config/services/apps-settings'] = array(
     'title' => 'Drupal connect apps',
@@ -307,10 +322,21 @@ function dc_apps_permission() {
  *  The secret key of the app.
  *
  * @return DrupalConnectApps
- *
- * @TODO: Use EntityFieldQuery().
  */
 function dc_apps_load_by_keys($key, $secret) {
+  $query = new entityFieldQuery();
+
+  $result = $query
+    ->entityCondition('entity_type', 'dc_app')
+    ->propertyCondition('app_key', $key)
+    ->propertyCondition('app_secret', $secret)
+    ->execute();
+
+  if (empty($result['dc_app'])) {
+    return;
+  }
+
+  return dc_apps_load(reset($result['dc_app'])->id);
 }
 
 /**
