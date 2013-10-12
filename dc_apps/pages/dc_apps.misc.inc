@@ -37,7 +37,9 @@ function dc_apps_main_app_page() {
       $items = array();
       $items[] = $app->generateLink('edit');
       $items[] = $app->generateLink('delete');
-      $items[] = $app->generateLink('documentation');
+
+      // Let other module add their own links.
+      drupal_alter('dc_apps_app_options', $items, $app);
 
       $rows[] = array(
         $app->title . '<br />' . $app->description,
