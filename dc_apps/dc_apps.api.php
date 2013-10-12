@@ -19,15 +19,15 @@
  *  $app = dc_apps_load(1);
  *  $link = $app->generateLink('new_methods');
  *
- * @pram $actions
+ * @param $actions
  *  List of actions that which the method can use.
+ * @param DrupalConnectApps $app
+ *  The app object.
  */
-function hook_dc_apps_generate_links_action_alter(&$actions) {
-  $actions = array(
-    'new_action' => array(
-      'title' => t('New action'),
-      'href' => 'admin/apps/' . $this->id . '/new_action',
-    ),
+function hook_dc_apps_generate_links_action_alter(&$actions, DrupalConnectApps $app) {
+  $actions['new_action'] = array(
+    'title' => t('New action'),
+    'href' => 'apps/' . $app->id . '/new_action',
   );
 }
 

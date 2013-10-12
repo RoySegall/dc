@@ -97,8 +97,7 @@ class DrupalConnectApps extends Entity {
       ),
     );
 
-    drupal_alter('dc_apps_generate_links_action_alter', $actions);
-
+    drupal_alter('dc_apps_generate_links_action', $actions, $this);
     $item = menu_get_item($actions[$action]['href']);
 
     if (!$item['access']) {
