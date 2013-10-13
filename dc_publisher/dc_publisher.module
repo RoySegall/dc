@@ -15,6 +15,7 @@ function dc_publisher_menu() {
     'description' => 'View documentation of an app',
     'access arguments' => array('view documentation'),
     'page callback' => 'dc_publisher_documentation',
+    'page arguments' => array(2),
   );
 
   $items['publisher'] = array(
@@ -67,6 +68,9 @@ function dc_publisher_dc_apps_app_options_alter(&$items, DrupalConnectApps $app)
 /**
  * Display documentation for an app.
  */
-function dc_publisher_documentation() {
+function dc_publisher_documentation(DrupalConnectapps $app) {
+  foreach (array_keys($app->need) as $entity) {
+  }
+
   return '';
 }
