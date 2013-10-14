@@ -37,6 +37,52 @@ function dc_publisher_menu() {
 }
 
 /**
+ * When oatuh want to pull data he need to pass the oauth signature test.
+ */
+function dc_publisher_oatuh_allowed() {
+  global $base_url;
+
+  $reader = new DrupalConnect($_GET['key'], $_GET['secret']);
+  $reader
+    ->SetUrl($base_url . '?q=publisher')
+    ->SetOauthRequest();
+
+  return $reader->VerifySignature($_GET['signature']);
+}
+
+/**
+ * Page callback - supply the information the oauth service selected.
+ */
+function dc_publisher_supply_information() {
+  $app = dc_apps_load_by_keys($_GET['key'], $_GET['secret']);
+
+  if (!$app) {
+    // No app found - return nothing.
+    drupal_json_output(t("App with the key and secret wasn't found"));
+  }
+
+  if (!in_array($_GET['data'], $app->need)) {
+    drupal_json_output(t("The @data information you selected cannot be supplied due to app settings."));
+  }
+
+  // Start the query.
+  $query = new entityFieldQuery();
+  $query->entityCondition('entity_type', $_GET['data']);
+
+  // Find the field to work upon and the operator to apply.
+
+  // Execute.
+  $result = $query->execute();
+
+  if (empty($result[$_GET['data']])) {
+    drupal_json_output(t('No data were found according to you search curatorial.'));
+  }
+
+  // Supply the information.
+  drupal_json_output(entity_load($_GET['data'], array_keys($result[$_GET['data']])));
+}
+
+/**
  * Implements hook_permission().
  */
 function dc_publisher_permission() {
