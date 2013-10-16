@@ -74,7 +74,7 @@ function dc_publisher_supply_information() {
     drupal_json_output(t("App with the key and secret wasn't found"));
   }
 
-  if (!in_array($_GET['data'], $app->need)) {
+  if (!in_array($_GET['data'], array_keys($app->need))) {
     drupal_json_output(t("The @data information you selected cannot be supplied due to app settings.", array('@data' => $_GET['data'])));
     exit();
   }
@@ -135,8 +135,15 @@ function dc_publisher_documentation(DrupalConnectapps $app) {
     ->SetOauthRequest()
     ->SetSignatureParameter();
 
+  $urls = array();
+
   foreach (array_keys($app->need) as $entity) {
+    $entity_reader = clone $reader;
+    $entity_reader->request->set_parameter('data', $entity);
+
+    $urls[] = l($entity, $entity_reader->getUrl());
+    $entity_reader->request->unset_parameter('data');
   }
 
-  return '';
+  return theme('item_list', array('items' => $urls));
 }
