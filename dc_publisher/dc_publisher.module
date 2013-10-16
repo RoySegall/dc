@@ -37,14 +37,27 @@ function dc_publisher_menu() {
 }
 
 /**
+ * Return the basic address of the the site oauth publisher page.
+ */
+function dc_publisher_base_url() {
+  global $base_url;
+
+  return $base_url . '?q=publisher';
+}
+
+/**
  * When oatuh want to pull data he need to pass the oauth signature test.
  */
 function dc_publisher_oatuh_allowed() {
   global $base_url;
 
+  if (!isset($_GET['key']) || !isset($_GET['secret'])) {
+    return;
+  }
+
   $reader = new DrupalConnect($_GET['key'], $_GET['secret']);
   $reader
-    ->SetUrl($base_url . '?q=publisher')
+    ->SetUrl(dc_publisher_base_url())
     ->SetOauthRequest();
 
   return $reader->VerifySignature($_GET['signature']);
@@ -62,7 +75,8 @@ function dc_publisher_supply_information() {
   }
 
   if (!in_array($_GET['data'], $app->need)) {
-    drupal_json_output(t("The @data information you selected cannot be supplied due to app settings."));
+    drupal_json_output(t("The @data information you selected cannot be supplied due to app settings.", array('@data' => $_GET['data'])));
+    exit();
   }
 
   // Start the query.
@@ -115,6 +129,12 @@ function dc_publisher_dc_apps_app_options_alter(&$items, DrupalConnectApps $app)
  * Display documentation for an app.
  */
 function dc_publisher_documentation(DrupalConnectapps $app) {
+  $reader = new DrupalConnect($app->app_key, $app->app_secret);
+  $reader
+    ->SetUrl(dc_publisher_base_url())
+    ->SetOauthRequest()
+    ->SetSignatureParameter();
+
   foreach (array_keys($app->need) as $entity) {
   }
 

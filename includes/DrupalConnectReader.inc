@@ -137,9 +137,18 @@ class DrupalConnect {
       'Content-type' => 'application/x-www-form-urlencoded',
     );
 
+    $url = $this->getUrl();
+
+    return drupal_http_request($url, array('headers' => $headers, 'method' => 'GET'));
+  }
+
+  /**
+   * Return the basic url without the additional parameters.
+   */
+  public function getUrl() {
     $url = $this->request->get_normalized_http_url() . '?';
     $url .= http_build_query($this->request->get_parameters(), '', '&');
 
-    return drupal_http_request($url, array('headers' => $headers, 'method' => 'GET'));
+    return $url;
   }
 }
