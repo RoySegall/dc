@@ -85,6 +85,11 @@ function dc_publisher_supply_information() {
 
   // Find the field to work upon and the operator to apply.
 
+  // display in batches.
+  $result_number = variable_get('apps_data_number', 25);
+  $page = !empty($_GET['page']) ? $_GET['page'] * $result_number : 1;
+  $query->range($page, $result_number);
+
   // Execute.
   $result = $query->execute();
 

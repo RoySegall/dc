@@ -80,12 +80,12 @@ function dc_apps_settings($form, $form_state) {
     '#default_value' => variable_get('apps_need_approve', FALSE),
   );
 
+  // TODO: Add an option for apps to overrides this option.
   $form['apps_data_number'] = array(
     '#type' => 'textfield',
     '#title' => t('How much results to supply in each request'),
     '#description' => t('When a client ask data from the app you can decide how much to supply each time. 25 by default'),
-    '#default_value' => variable_get('apps_data_number', 25)
-
+    '#default_value' => variable_get('apps_data_number', 25),
   );
 
   return system_settings_form($form);
