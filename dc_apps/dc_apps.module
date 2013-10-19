@@ -373,3 +373,17 @@ function dc_apps_build_fields($entity) {
   return $schema_info;
 }
 
+/**
+ * verify that the user approve the app.
+ *
+ * @param DrupalConnectApps $app
+ *  The app object.
+ * @param $account
+ *  The account of the user.*  The account of the user.
+ *
+ * @return bool
+ *  True or false if the user approved the app.
+ */
+function dc_apps_user_approved_app(DrupalConnectApps $app, $account = NULL) {
+
+}

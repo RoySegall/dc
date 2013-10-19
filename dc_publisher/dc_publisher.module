@@ -67,6 +67,7 @@ function dc_publisher_oatuh_allowed() {
  * Page callback - supply the information the oauth service selected.
  */
 function dc_publisher_supply_information() {
+  global $user;
   $app = dc_apps_load_by_keys($_GET['key'], $_GET['secret']);
 
   if (!$app) {
@@ -77,6 +78,22 @@ function dc_publisher_supply_information() {
   if (!in_array($_GET['data'], array_keys($app->need))) {
     drupal_json_output(t("The @data information you selected cannot be supplied due to app settings.", array('@data' => $_GET['data'])));
     exit();
+  }
+
+  // Verify that the customer asked for user information.
+  if ($_GET['data'] == 'user') {
+
+    // Check that user is logged in.
+    if (!user_is_logged_in()) {
+      // Redirect the user for logging in.
+    }
+
+    if (!dc_apps_user_approved_app($app)) {
+      // Redirect the user to approve the app.
+    }
+
+    drupal_json_output($user);
+    return;
   }
 
   // Start the query.
@@ -99,6 +116,7 @@ function dc_publisher_supply_information() {
 
   // Supply the information.
   drupal_json_output(entity_load($_GET['data'], array_keys($result[$_GET['data']])));
+
 }
 
 /**
