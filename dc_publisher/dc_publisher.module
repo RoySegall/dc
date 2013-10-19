@@ -25,6 +25,13 @@ function dc_publisher_menu() {
     'page callback' => 'dc_publisher_supply_information',
   );
 
+  $items['dc/connect'] = array(
+    'title' => 'Connect',
+    'description' => 'Allow to pull information from user',
+    'access callback' => 'dc_publisher_oatuh_allowed',
+    'page callback' => 'dc_publisher_connect_with',
+  );
+
   $items['apps/%dc_apps/user_approve_app'] = array(
     'title' => 'Approve app',
     'description' => 'Allow to user approve app',
@@ -67,7 +74,6 @@ function dc_publisher_oatuh_allowed() {
  * Page callback - supply the information the oauth service selected.
  */
 function dc_publisher_supply_information() {
-  global $user;
   $app = dc_apps_load_by_keys($_GET['key'], $_GET['secret']);
 
   if (!$app) {
@@ -80,29 +86,20 @@ function dc_publisher_supply_information() {
     exit();
   }
 
-  // Verify that the customer asked for user information.
-  if ($_GET['data'] == 'user') {
-
-    // Check that user is logged in.
-    if (!user_is_logged_in()) {
-      // Redirect the user for logging in.
-    }
-
-    if (!dc_apps_user_approved_app($app)) {
-      // Redirect the user to approve the app.
-    }
-
-    drupal_json_output($user);
-    return;
-  }
-
   // Start the query.
   $query = new entityFieldQuery();
   $query->entityCondition('entity_type', $_GET['data']);
 
+  // When searching for users and the checkbox was checked only users which
+  // approve the app will be display in the search results.
+  if (variable_get('apps_search_for_users_limit', FALSE) && $_GET['data'] == 'user') {
+    // Adding tag for altering query later on.
+    $query->addTag('DrupalPublisherOnlyApprovedUsers');
+  }
+
   // Find the field to work upon and the operator to apply.
 
-  // display in batches.
+  // Display in batches.
   $result_number = variable_get('apps_data_number', 25);
   $page = !empty($_GET['page']) ? $_GET['page'] * $result_number : 1;
   $query->range($page, $result_number);
@@ -116,7 +113,27 @@ function dc_publisher_supply_information() {
 
   // Supply the information.
   drupal_json_output(entity_load($_GET['data'], array_keys($result[$_GET['data']])));
+}
 
+/**
+ * A client asked to connect with a user - supply the information about the
+ * user.
+ */
+function dc_publisher_connect_with() {
+  global $user;
+
+  $app = dc_apps_load_by_keys($_GET['key'], $_GET['secret']);
+
+  // Check that user is logged in.
+  if (!user_is_logged_in()) {
+    // Redirect the user for logging in.
+  }
+
+  if (!dc_apps_user_approved_app($app)) {
+    // Redirect the user to approve the app.
+  }
+
+  drupal_json_output($user);
 }
 
 /**

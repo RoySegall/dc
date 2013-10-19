@@ -72,7 +72,6 @@ function dc_apps_main_app_page() {
  * Settings for the Drupal connect apps.
  */
 function dc_apps_settings($form, $form_state) {
-
   $form['apps_need_approve'] = array(
     '#type' => 'checkbox',
     '#title' => t('Apps need to be approve?'),
@@ -86,6 +85,15 @@ function dc_apps_settings($form, $form_state) {
     '#title' => t('How much results to supply in each request'),
     '#description' => t('When a client ask data from the app you can decide how much to supply each time. 25 by default'),
     '#default_value' => variable_get('apps_data_number', 25),
+  );
+
+  $description = 'Apps can search for information on your site.';
+  $description .= 'When searching users you can define that only that approve the app will appear in search.';
+  $form['apps_search_for_users_limit'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('When search for user information, display only user which approved the app?'),
+    '#description' => t($description),
+    '#default_value' => variable_get('apps_search_for_users_limit', FALSE),
   );
 
   return system_settings_form($form);
