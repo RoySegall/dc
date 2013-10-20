@@ -10,5 +10,35 @@
 function dc_publisher_install() {
   $schema = array();
 
+  $schema['approved_app'] = array(
+    'description' => 'the approved apps by the user.',
+    'fields' => array(
+      'id' => array(
+        'description' => 'The identifier.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'app_id' => array(
+        'description' => 'The primary identifier for a applications.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'The {users}.uid that owns this application.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'timestamp' => array(
+        'description' => 'The Unix timestamp when the entry was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+  );
+
   return $schema;
 }
