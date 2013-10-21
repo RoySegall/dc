@@ -47,7 +47,7 @@ function dc_apps_create($data = array()) {
  * Load multiple Drupal connect app entity.
  *
  * @param $ids
- *  Array if Drupal connect apps IDs.
+ *  Array of Drupal connect apps IDs.
  *
  * @return DrupalConnectApps[]
  *  Array of Drupal connect apps objects.

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Main file of the module Drupal connect publisher.
+ * Main file of the module Drupal publisher publisher.
  */
 
 /**
@@ -41,6 +41,79 @@ function dc_publisher_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function dc_publisher_entity_info() {
+  return array(
+    'approved_app' => array(
+      'label' => t('Approved app'),
+      'entity class' => 'DrupalPublisherApprovedApp',
+      'controller class' => 'EntityAPIController',
+      'base table' => 'approved_app',
+      'entity keys' => array(
+        'id' => 'id',
+      ),
+    ),
+  );
+}
+
+/**
+ * Create Drupal publisher approved app entity.
+ *
+ * @param $data
+ *  Initialize data of the Drupal publisher app.
+ *
+ * @return DrupalPublisherApprovedApp
+ *  Initialized object a Drupal publisher approved app.
+ */
+function dc_publisher_approved_app_create($data = array()) {
+  global $user;
+
+  $data += array(
+    'uid' => $user->uid,
+    'timestamp' => REQUEST_TIME,
+  );
+
+  return entity_create('approved_app', $data);
+}
+
+/**
+ * Load multiple Drupal publisher approved app entity.
+ *
+ * @param $ids
+ *  Array of Drupal publisher apps IDs.
+ *
+ * @return DrupalPublisherApprovedApp[]
+ *  Array of Drupal publisher approved apps objects.
+ */
+function dc_publisher_approved_app_load_multiple($ids) {
+  return entity_load('approved_app', $ids);
+}
+
+/**
+ * Load a single Drupal publisher approved app entity.
+ *
+ * @param $id
+ *  Id a Drupal publisher app entity.
+ *
+ * @return DrupalPublisherApprovedApp
+ *  Drupal publisher approved apps object.
+ */
+function dc_publisher_approved_app_load($id) {
+  return entity_load('approved_app', array($id));
+}
+
+/**
+ * Delete multiple Drupal publisher approved app entities.
+ *
+ * @param $ids
+ *  List of Drupal publisher app IDs to delete.
+ */
+function dc_publisher_approved_app_delete_multiple($ids) {
+  entity_delete_multiple('approved_app', $ids);
 }
 
 /**

@@ -5,3 +5,5 @@ core = 7.x
 dependencies[] = dc_apps
 dependencies[] = entity
 dependencies[] = oauth_common
+
+files[] = includes/dc_publisher.entity.inc
