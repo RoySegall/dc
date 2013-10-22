@@ -265,7 +265,7 @@ function dc_apps_app_approve($form, &$form_state, DrupalConnectApps $app) {
   }
 
   return confirm_form($form,
-    t('Are you sure you want to approve %title?', array('%title' => $app->title)),
+    t('Are you sure you want to approve @title?', array('@title' => $app->title)),
     'admin/apps',
     t('This app access to the next entities: !entities', array('!entities' => theme('item_list', array('items' => $need)))),
     t('Approve'),

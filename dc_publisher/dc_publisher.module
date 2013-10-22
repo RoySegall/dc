@@ -35,9 +35,10 @@ function dc_publisher_menu() {
   $items['apps/%dc_apps/user_approve_app'] = array(
     'title' => 'Approve app',
     'description' => 'Allow to user approve app',
-    'access callback' => TRUE,
-    'page callback' => 'dc_apps_user_approve_app',
-    'page arguments' => array(1),
+    'access callback' => 'dc_publisher_user_approve_app_access',
+    'access arguments' => array(1),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dc_publisher_user_approve_app', 1),
   );
 
   return $items;
@@ -259,4 +260,63 @@ function dc_publisher_documentation(DrupalConnectapps $app) {
   }
 
   return theme('item_list', array('items' => $urls));
+}
+
+/**
+ * Access callback for determine if the user can approve the app.
+ */
+function dc_publisher_user_approve_app_access(DrupalConnectApps $app, $account = NULL) {
+
+  // Anonymous users are not allowed to approve any app.
+  if (!user_is_logged_in()) {
+    return FALSE;
+  }
+
+  // Load the current user.
+  if (!$account) {
+    global $user;
+    $account = user_load($user->uid);
+  }
+
+  // See if the user approved this app before.
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'approved_app')
+    ->propertyCondition('app_id', $app->id)
+    ->propertyCondition('uid', $account->uid)
+    ->execute();
+
+  return empty($result['approved_app']);
+}
+
+/**
+ * Displaying the form for approving apps.
+ */
+function dc_publisher_user_approve_app($form, &$form_state, DrupalConnectApps $app) {
+  $form_state['#entity'] = $app;
+
+  return confirm_form($form,
+    t('Are you approving @title?', array('@title' => $app->title)),
+    'admin/apps',
+    t('This app need your approve for accessing your information. Are you approve this operation?'),
+    t('Approve'),
+    t('Cancel')
+  );
+}
+
+/**
+ * Submit handler - user approved the app. Save it and redirect the to where
+ * he came from.
+ */
+function dc_publisher_user_approve_app_submit($form, &$form_state) {
+  global $base_url, $user;
+  $form_state['redirect'] = $base_url;
+  $app = $form_state['#entity'];
+
+  $approve = dc_publisher_approved_app_create();
+  $approve->uid = $user->uid;
+  $approve->app_id = $app->id;
+  $approve->save();
+
+  drupal_set_message(t('The app @name has been approved. Thank you.', array('@name' => $app->title)));
 }
