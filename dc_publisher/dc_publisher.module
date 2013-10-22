@@ -41,6 +41,15 @@ function dc_publisher_menu() {
     'page arguments' => array('dc_publisher_user_approve_app', 1),
   );
 
+  $items['user/%user/apps'] = array(
+    'title' => 'Apps',
+    'description' => 'Manage your approved apps',
+    'access arguments' => array('manage approved apps'),
+    'page callback' => 'dc_publisher_manage_apps',
+    'page arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+  );
+
   return $items;
 }
 
@@ -219,6 +228,10 @@ function dc_publisher_permission() {
       'title' => t('View documentation'),
       'description' => t('Allow to the user watch the documentation of an app.'),
     ),
+    'manage approved apps' => array(
+      'title' => t('Manage user own apps'),
+      'description' => t('Allow to user manage his approved apps.'),
+    ),
   );
 }
 
@@ -319,4 +332,11 @@ function dc_publisher_user_approve_app_submit($form, &$form_state) {
   $approve->save();
 
   drupal_set_message(t('The app @name has been approved. Thank you.', array('@name' => $app->title)));
+}
+
+/**
+ * Allow to user manage his apps.
+ */
+function dc_publisher_manage_apps() {
+  return '';
 }
