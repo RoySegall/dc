@@ -10,7 +10,7 @@
 function dc_publisher_schema() {
   $schema = array();
 
-  $schema['approved_app'] = array(
+  $schema['approved_apps'] = array(
     'description' => 'the approved apps by the user.',
     'fields' => array(
       'id' => array(

@@ -169,7 +169,6 @@ function dc_apps_app_form_validate($form, $form_state) {
  * Submit handler.
  */
 function dc_apps_app_form_submit($form, &$form_state) {
-  /** @var DrupalConnectApps $app */
   $app = $form_state['#entity'];
   $values = $form_state['values'];
 

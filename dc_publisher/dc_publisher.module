@@ -58,11 +58,11 @@ function dc_publisher_menu() {
  */
 function dc_publisher_entity_info() {
   return array(
-    'approved_app' => array(
+    'approved_apps' => array(
       'label' => t('Approved app'),
       'entity class' => 'DrupalPublisherApprovedApp',
       'controller class' => 'EntityAPIController',
-      'base table' => 'approved_app',
+      'base table' => 'approved_apps',
       'entity keys' => array(
         'id' => 'id',
       ),
@@ -79,7 +79,7 @@ function dc_publisher_entity_info() {
  * @return DrupalPublisherApprovedApp
  *  Initialized object a Drupal publisher approved app.
  */
-function dc_publisher_approved_app_create($data = array()) {
+function dc_publisher_approved_apps_create($data = array()) {
   global $user;
 
   $data += array(
@@ -87,7 +87,7 @@ function dc_publisher_approved_app_create($data = array()) {
     'timestamp' => REQUEST_TIME,
   );
 
-  return entity_create('approved_app', $data);
+  return entity_create('approved_apps', $data);
 }
 
 /**
@@ -99,8 +99,8 @@ function dc_publisher_approved_app_create($data = array()) {
  * @return DrupalPublisherApprovedApp[]
  *  Array of Drupal publisher approved apps objects.
  */
-function dc_publisher_approved_app_load_multiple($ids) {
-  return entity_load('approved_app', $ids);
+function dc_publisher_approved_apps_load_multiple($ids) {
+  return entity_load('approved_apps', $ids);
 }
 
 /**
@@ -112,8 +112,8 @@ function dc_publisher_approved_app_load_multiple($ids) {
  * @return DrupalPublisherApprovedApp
  *  Drupal publisher approved apps object.
  */
-function dc_publisher_approved_app_load($id) {
-  return entity_load('approved_app', array($id));
+function dc_publisher_approved_apps_load($id) {
+  return entity_load('approved_apps', array($id));
 }
 
 /**
@@ -122,8 +122,8 @@ function dc_publisher_approved_app_load($id) {
  * @param $ids
  *  List of Drupal publisher app IDs to delete.
  */
-function dc_publisher_approved_app_delete_multiple($ids) {
-  entity_delete_multiple('approved_app', $ids);
+function dc_publisher_approved_apps_delete_multiple($ids) {
+  entity_delete_multiple('approved_apps', $ids);
 }
 
 /**
@@ -212,7 +212,7 @@ function dc_publisher_connect_with() {
     // Redirect the user for logging in.
   }
 
-  if (!dc_apps_user_approved_app($app)) {
+  if (!dc_apps_user_approved_apps($app)) {
     // Redirect the user to approve the app.
   }
 
@@ -294,12 +294,12 @@ function dc_publisher_user_approve_app_access(DrupalConnectApps $app, $account =
   // See if the user approved this app before.
   $query = new EntityFieldQuery();
   $result = $query
-    ->entityCondition('entity_type', 'approved_app')
+    ->entityCondition('entity_type', 'approved_apps')
     ->propertyCondition('app_id', $app->id)
     ->propertyCondition('uid', $account->uid)
     ->execute();
 
-  return empty($result['approved_app']);
+  return empty($result['approved_apps']);
 }
 
 /**
@@ -326,7 +326,7 @@ function dc_publisher_user_approve_app_submit($form, &$form_state) {
   $form_state['redirect'] = $base_url;
   $app = $form_state['#entity'];
 
-  $approve = dc_publisher_approved_app_create();
+  $approve = dc_publisher_approved_apps_create();
   $approve->uid = $user->uid;
   $approve->app_id = $app->id;
   $approve->save();
@@ -337,6 +337,21 @@ function dc_publisher_user_approve_app_submit($form, &$form_state) {
 /**
  * Allow to user manage his apps.
  */
-function dc_publisher_manage_apps() {
+function dc_publisher_manage_apps($account) {
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'approved_apps')
+    ->propertyCondition('uid', $account->uid)
+    ->execute();
+
+  $header = array(t('Application name'), t('Options'));
+  $rows = array();
+  if (empty($result['approved_apps'])) {
+    $rows[] = array(array('data' => t('None approved apps were found'), 'colspan' => 2));
+  }
+  else {
+    // TODO: Cache.
+  }
+
   return '';
 }
