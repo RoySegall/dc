@@ -50,7 +50,32 @@ function dc_publisher_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  $items['user/%user/apps/%/edit'] = array(
+    'title' => 'Edit',
+    'description' => 'Edit an approval of an apps',
+    'access arguments' => array('manage approved apps'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dc_publisher_edit_approve', 3),
+  );
+
+  $items['user/%user/apps/%/delete'] = array(
+    'title' => 'Delete',
+    'description' => 'Delete an approval of an apps',
+    'access arguments' => array('manage approved apps'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dc_publisher_delete_approve', 3),
+  );
+
   return $items;
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function dc_publisher_admin_paths() {
+  return array(
+    'user/*/apps/*/edit' => FALSE,
+  );
 }
 
 /**
@@ -372,23 +397,53 @@ function dc_publisher_manage_apps($account) {
     $apps_id = array();
     $approved_apps = dc_publisher_approved_apps_load_multiple(array_keys($result['approved_apps']));
     foreach ($approved_apps as $approve) {
-      $apps_id[] = $approve->app_id;
+      $apps_id[$approve->app_id] = $approve;
     }
 
     $query = new EntityFieldQuery();
     $result = $query
       ->entityCondition('entity_type', 'dc_app')
-      ->propertyCondition('id', $apps_id)
+      ->propertyCondition('id', array_keys($apps_id))
       ->execute();
 
     $apps = dc_apps_load_multiple(array_keys($result['dc_app']));
 
     foreach ($apps as $app) {
-      $rows[] = array($app->title, t('Edit'), t('Delete'));
+      $rows[] = array(
+        $app->title,
+        l(t('Edit'), 'user/' . $account->uid . '/apps/' . $apps_id[$app->id]->id . '/edit'),
+        l(t('Delete'), 'user/' . $account->uid . '/apps/' . $apps_id[$app->id]->id . '/delete'),
+      );
     }
   }
 
   $content = theme('table', array('header' => $header, 'rows' => $rows));
 
   return $content;
+}
+
+/**
+ * Edit application approve status.
+ */
+function dc_publisher_edit_approve($form, $form_state) {
+  return $form;
+}
+
+/**
+ * Submit handler for edit application approve status.
+ */
+function dc_publisher_edit_approve_submit($form, $form_state) {
+}
+
+/**
+ * Delete approve of an application.
+ */
+function dc_publisher_delete_approve($form, $form_state) {
+  return $form;
+}
+
+/**
+ * Submit handler for delete approve of an application.
+ */
+function dc_publisher_delete_approve_submit($form, $form_state) {
 }

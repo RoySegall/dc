@@ -35,4 +35,18 @@ class DrupalPublisherApprovedApp extends Entity {
    * The status of the app - disabled, enabled or pending.
    */
   public $status;
+
+  /**
+   * Get the application object.
+   *
+   * @return DrupalConnectApps
+   *  The application object.
+   */
+  function app() {
+    if (!$this->app_id) {
+      return;
+    }
+
+    return dc_apps_load($this->app_id);
+  }
 }
