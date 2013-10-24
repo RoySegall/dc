@@ -66,6 +66,7 @@ function dc_publisher_entity_info() {
       'entity keys' => array(
         'id' => 'id',
       ),
+      'load hook' => '',
     ),
   );
 }
