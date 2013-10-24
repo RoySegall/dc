@@ -129,6 +129,17 @@ function dc_publisher_approved_apps_delete_multiple($ids) {
 }
 
 /**
+ * Implements hook_entity_delete().
+ */
+function dc_publisher_entity_delete($entity, $type) {
+  if ($type != 'dc_app') {
+    return;
+  }
+
+  // TODO: Do. http://www.youtube.com/watch?v=Ra70O9nps6E
+}
+
+/**
  * Return the basic address of the the site oauth publisher page.
  */
 function dc_publisher_base_url() {
@@ -340,20 +351,44 @@ function dc_publisher_user_approve_app_submit($form, &$form_state) {
  * Allow to user manage his apps.
  */
 function dc_publisher_manage_apps($account) {
+  // TODO: Cache.
   $query = new EntityFieldQuery();
   $result = $query
     ->entityCondition('entity_type', 'approved_apps')
     ->propertyCondition('uid', $account->uid)
     ->execute();
 
-  $header = array(t('Application name'), t('Options'));
+  $header = array(
+    t('Application name'),
+    array('data' => t('Options'), 'colspan' => 2),
+  );
+
   $rows = array();
   if (empty($result['approved_apps'])) {
-    $rows[] = array(array('data' => t('None approved apps were found'), 'colspan' => 2));
+    $rows[] = array(array('data' => t('None approved apps were found'), 'colspan' => 3));
   }
   else {
-    // TODO: Cache.
+    // Get the approved apps ID.
+    $apps_id = array();
+    $approved_apps = dc_publisher_approved_apps_load_multiple(array_keys($result['approved_apps']));
+    foreach ($approved_apps as $approve) {
+      $apps_id[] = $approve->app_id;
+    }
+
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->entityCondition('entity_type', 'dc_app')
+      ->propertyCondition('id', $apps_id)
+      ->execute();
+
+    $apps = dc_apps_load_multiple(array_keys($result['dc_app']));
+
+    foreach ($apps as $app) {
+      $rows[] = array($app->title, t('Edit'), t('Delete'));
+    }
   }
 
-  return '';
+  $content = theme('table', array('header' => $header, 'rows' => $rows));
+
+  return $content;
 }

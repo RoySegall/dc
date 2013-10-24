@@ -29,4 +29,10 @@ class DrupalPublisherApprovedApp extends Entity {
    * The Unix timestamp when the entry was created.
    */
   public $timestamp;
+
+  /**
+   * @var
+   * The status of the app - disabled, enabled or pending.
+   */
+  public $status;
 }
