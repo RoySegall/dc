@@ -114,7 +114,8 @@ function dc_publisher_approved_apps_load_multiple($ids) {
  *  Drupal publisher approved apps object.
  */
 function dc_publisher_approved_apps_load($id) {
-  return entity_load('approved_apps', array($id));
+  $entity = entity_load('approved_apps', array($id));
+  return reset($entity);
 }
 
 /**
