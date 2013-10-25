@@ -499,12 +499,28 @@ function dc_publisher_edit_approve_submit($form, &$form_state) {
 /**
  * Delete approve of an application.
  */
-function dc_publisher_delete_approve($form, $form_state) {
-  return $form;
+function dc_publisher_delete_approve($form, &$form_state, $user, $approve_id) {
+  $approve = dc_publisher_approved_apps_load($approve_id);
+  $form_state['#entity'] = $approve;
+  $form_state['#user'] = $user;
+
+  return confirm_form($form,
+    t('Are you sure you want to remove the approve for the app @title?', array('@title' => $approve->app()->title)),
+    'user/' . $user->uid . '/apps',
+    t('This action cannot be reversed.'),
+    t('Approve'),
+    t('Cancel')
+  );
 }
 
 /**
  * Submit handler for delete approve of an application.
  */
-function dc_publisher_delete_approve_submit($form, $form_state) {
+function dc_publisher_delete_approve_submit($form, &$form_state) {
+  $approve = $form_state['#entity'];
+  $user = $form_state['#user'];
+
+  $form_state['redirect'] = 'user/' . $user->uid . '/apps';
+
+  $approve->delete();
 }
