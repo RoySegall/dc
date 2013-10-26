@@ -61,7 +61,7 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
       '#default_value' => empty($need_info['operator']) ? '' : $need_info['operator'],
       '#options' => array(
         '=' => '=',
-        '%LIKE%' => t('Like'),
+        'CONTAINS' => t('Contains'),
       ),
       '#states' => array(
         'visible' => array(
