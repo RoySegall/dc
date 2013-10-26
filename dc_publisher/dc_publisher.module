@@ -16,6 +16,7 @@ function dc_publisher_menu() {
     'access arguments' => array('view documentation'),
     'page callback' => 'dc_publisher_documentation',
     'page arguments' => array(2),
+    'type' => MENU_LOCAL_TASK,
   );
 
   $items['publisher'] = array(
@@ -218,14 +219,17 @@ function dc_publisher_supply_information() {
   // approve the app will be display in the search results.
   if (variable_get('apps_search_for_users_limit', FALSE) && $_GET['data'] == 'user') {
     // Adding tag for altering query later on.
-    $query->addTag('DrupalPublisherOnlyApprovedUsers');
+    $query->addTag('dc_publisher_approved_apps');
+
+    // Adding the app id for the join.
+    $query->addMetaData('app_id', $app->id);
   }
 
   // Find the field to work upon and the operator to apply.
 
   // Display in batches.
   $result_number = variable_get('apps_data_number', 25);
-  $page = !empty($_GET['page']) ? $_GET['page'] * $result_number : 1;
+  $page = !empty($_GET['page']) ? $_GET['page'] * $result_number : 0;
   $query->range($page, $result_number);
 
   // Execute.
@@ -237,6 +241,20 @@ function dc_publisher_supply_information() {
 
   // Supply the information.
   drupal_json_output(entity_load($_GET['data'], array_keys($result[$_GET['data']])));
+}
+
+/**
+ * Implements hook_query_QUERY_TAG_alter().
+ *
+ * The administrator define that apps searching for users can get the users
+ * which approved the app.
+ */
+function dc_publisher_query_dc_publisher_approved_apps_alter(QueryAlterableInterface $query) {
+  $app_id = $query->getMetaData('app_id');
+
+  $query->join('approved_apps', 'approve', "approve.uid = users.uid");
+  $query->condition('approve.app_id', $app_id);
+  $query->condition('approve.status', 1);
 }
 
 /**
@@ -460,7 +478,6 @@ function dc_publisher_edit_approve($form, &$form_state, $user, $approve_id) {
     '#options' => array(
       0 => t('Disabled'),
       1 => t('Enabled'),
-      2 => t('Pending'),
     ),
     '#default_value' => $approve->status,
   );
@@ -510,7 +527,7 @@ function dc_publisher_delete_approve($form, &$form_state, $user, $approve_id) {
     t('Are you sure you want to remove the approve for the app @title?', array('@title' => $approve->app()->title)),
     'user/' . $user->uid . '/apps',
     t('This action cannot be reversed.'),
-    t('Approve'),
+    t('Delete'),
     t('Cancel')
   );
 }

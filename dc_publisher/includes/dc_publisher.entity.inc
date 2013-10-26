@@ -32,7 +32,7 @@ class DrupalPublisherApprovedApp extends Entity {
 
   /**
    * @var
-   * The status of the app - disabled, enabled or pending.
+   * The status of the app - disabled, enabled.
    */
   public $status;
 
