@@ -118,10 +118,23 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
     '#markup' => $app->app_secret ? $app->app_secret : t('Need be generated'),
   );
 
+  $form['oauth']['connect'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Connect with'),
+    '#description' => t('Is this is a "Connect with" application?'),
+    '#default_value' => $app->connect_with,
+  );
+
   $form['oauth']['site'] = array(
     '#type' => 'textfield',
     '#title' => t('Site'),
     '#description' => t('Fill in the site address. This will affect the signature and could affect the redirect of the user.'),
+    '#default_value' => $app->app_site,
+    '#states' => array(
+      'visible' => array(
+        ':input[name="connect"]' => array('checked' => TRUE),
+      ),
+    ),
   );
 
   $form['actions'] = array(
@@ -148,18 +161,27 @@ function dc_apps_app_form_validate($form, $form_state) {
     form_set_error('title', t('The name of the app should be only in english.'));
   }
 
-  // The app must user at least one entity.
-  $entities = array_keys(entity_get_info());
-  $entity_selected = FALSE;
-  foreach ($entities as $entity) {
-    if ($form_state['values'][$entity . '_need']) {
-      $entity_selected = TRUE;
-      break;
+  // When basic "Connect with" app don't need entities to search upon.
+  if ($form_state['values']['connect']) {
+    if (empty($form_state['values']['site'])) {
+      // But she need a site.
+      form_set_error('site', t('A "Connect with" app need a site address to be valid.'));
     }
   }
+  else {
+    // The app must user at least one entity.
+    $entities = array_keys(entity_get_info());
+    $entity_selected = FALSE;
+    foreach ($entities as $entity) {
+      if ($form_state['values'][$entity . '_need']) {
+        $entity_selected = TRUE;
+        break;
+      }
+    }
 
-  if (!$entity_selected) {
-    form_set_error('', t('A basic must use at least one entity.'));
+    if (!$entity_selected) {
+      form_set_error('', t('A basic app must use at least one entity.'));
+    }
   }
 
   field_attach_form_validate('dc_app', $form_state['#entity'], $form, $form_state);
@@ -192,6 +214,7 @@ function dc_apps_app_form_submit($form, &$form_state) {
   $app->title = $values['title'];
   $app->description = $values['description'];
   $app->need = $need;
+  $app->connect_with = $values['connect'];
   $app->uid = user_load_by_name($values['name'])->uid;
   $app->app_site = $values['site'];
 

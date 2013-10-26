@@ -64,9 +64,21 @@ function dc_apps_schema() {
         'description' => 'The secret of the app.',
         'type' => 'text',
       ),
+      'connect_with' => array(
+        'description' => 'Define if this a connect with application',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
       'app_site' => array(
         'description' => 'The site address which the data will be pulled from.',
         'type' => 'text',
+      ),
+      'metadata' => array(
+        'description' => 'Holds metadata information about the app.',
+        'type' => 'blob',
+        'size' => 'big',
+        'serialize' => TRUE,
       ),
     ),
     'primary key' => array('id'),

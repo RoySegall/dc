@@ -58,9 +58,21 @@ class DrupalConnectApps extends Entity {
 
   /**
    * @var
+   * Define if this a connect with application
+   */
+  public $connect_with;
+
+  /**
+   * @var
    * The site address which the data will be pulled from.
    */
   public $app_site;
+
+  /**
+   * @var
+   * Holds metadata information about the app.
+   */
+  public $metadata;
 
   /**
    * Overrides save().
@@ -115,5 +127,31 @@ class DrupalConnectApps extends Entity {
 
     $this->app_key = str_replace(array(' ', '', '-'), '_', strtolower($this->title));
     $this->app_secret = md5($user->name . $this->time);
+  }
+
+  /**
+   * Get a metadata value.
+   *
+   * @param $name
+   *  The name of the metadata.
+   */
+  public function getMetaData($name) {
+    return $this->metadata[$name];
+  }
+
+  /**
+   * Set metadata information.
+   *
+   * @param $name
+   *  The name of the metadata.
+   * @param $value
+   *  The value of the metadata.
+   *
+   * @return DrupalConnectApps
+   */
+  public function setMetaData($name, $value) {
+    $this->metadata[$name] = $value;
+
+    return $this;
   }
 }
