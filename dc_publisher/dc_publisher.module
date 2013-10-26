@@ -156,6 +156,10 @@ function dc_publisher_approved_apps_delete_multiple($ids) {
 
 /**
  * Implements hook_entity_delete().
+ *
+ * After deleting an app we don't need any more the approval of users for that
+ * app. We need to delete in batch 250 approval at a time.
+ * This will be done via a queue worker.
  */
 function dc_publisher_entity_delete($entity, $type) {
   if ($type != 'dc_app') {
@@ -178,8 +182,6 @@ function dc_publisher_base_url() {
  * When oatuh want to pull data he need to pass the oauth signature test.
  */
 function dc_publisher_oatuh_allowed() {
-  global $base_url;
-
   if (!isset($_GET['key']) || !isset($_GET['secret'])) {
     return;
   }
