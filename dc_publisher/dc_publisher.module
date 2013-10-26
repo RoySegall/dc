@@ -208,7 +208,6 @@ function dc_publisher_supply_information() {
 
   if (!in_array($_GET['data'], array_keys($app->need))) {
     drupal_json_output(t("The @data information you selected cannot be supplied due to app settings.", array('@data' => $_GET['data'])));
-    exit();
   }
 
   // Start the query.
@@ -226,6 +225,32 @@ function dc_publisher_supply_information() {
   }
 
   // Find the field to work upon and the operator to apply.
+  if (isset($_GET['search'])) {
+    $info = $app->need[$_GET['data']];
+    $entity_info = entity_get_info($_GET['data']);
+
+    // Check if the we looking for data in a field or in a property.
+    if (in_array($info['search'], $entity_info['schema_fields_sql']['base table'])) {
+      // Adding the property to the query.
+      $query->propertyCondition($info['search'], $_GET['search'], $info['operator']);
+    }
+    else {
+      // Loading the field info for knowing the storage fields so we could know
+      // on which column the search will be applied.
+      $field_info = field_info_field($info['search']);
+      $storage_information = array_keys($field_info['storage']['details']['sql']['FIELD_LOAD_CURRENT']['field_data_body']);
+
+      // Usually, the first column in the storage information holds the value of
+      // the field. We can count on that.
+      $search_column = reset($storage_information);
+
+      // Let other modules with special fields to alter the search column.
+      drupal_alter('dc_publisher_field_search_column_alter', $search_column, $field_info);
+
+      // Add the field to the query.
+      $query->fieldCondition($info['search'], $search_column, $_GET['search'], $info['operator']);
+    }
+  }
 
   // Display in batches.
   $result_number = variable_get('apps_data_number', 25);
