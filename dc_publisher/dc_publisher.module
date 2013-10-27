@@ -19,6 +19,15 @@ function dc_publisher_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  $items['admin/apps/%dc_apps/documentation/%'] = array(
+    'title callback' => 'dc_publisher_documentation_specific_title',
+    'title arguments' => array(2, 4),
+    'access callback' => 'dc_publisher_documentation_specific_access',
+    'access arguments' => array(2, 4),
+    'page callback' => 'dc_publisher_documentation_specific',
+    'page arguments' => array(2, 4),
+  );
+
   $items['publisher'] = array(
     'title' => 'Publisher',
     'description' => 'Supplying JSON information for an app',
@@ -353,11 +362,7 @@ function dc_publisher_documentation(DrupalConnectapps $app) {
   $urls = array();
 
   foreach (array_keys($app->need) as $entity) {
-    $entity_reader = clone $reader;
-    $entity_reader->request->set_parameter('data', $entity);
-
-    $urls[] = l($entity, $entity_reader->getUrl());
-    $entity_reader->request->unset_parameter('data');
+    $urls[] = l($entity, 'admin/apps/' . $app->id . '/documentation/' . $entity);
   }
 
   return theme('item_list', array('items' => $urls));
@@ -567,4 +572,46 @@ function dc_publisher_delete_approve_submit($form, &$form_state) {
   $form_state['redirect'] = 'user/' . $user->uid . '/apps';
 
   $approve->delete();
+}
+
+/**
+ * Access callback for the title of the specific documentation.
+ */
+function dc_publisher_documentation_specific_title(DrupalConnectApps $app, $type) {
+  $entity = entity_get_info($type);
+  return t('@type documentation for @app', array('@type' => $entity['label'], '@app' => $app->title));
+}
+
+/**
+ * Access callback for specific entity documentation.
+ */
+function dc_publisher_documentation_specific_access(DrupalConnectApps $app, $type) {
+  if (!in_array($type, array_keys($app->need))) {
+    $params = array(
+      '@type' => $type,
+    );
+    drupal_set_message(t('The app @type is not listed in of the need entities.', $params), 'warning');
+    return FALSE;
+  }
+
+  return user_access('view documentation');
+}
+
+/**
+ * Display specific app documentation.
+ */
+function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
+  $reader = new DrupalConnect($app->app_key, $app->app_secret);
+
+  $reader
+    ->SetUrl(dc_publisher_base_url())
+    ->SetOauthRequest()
+    ->SetSignatureParameter();
+
+  $entity_reader = clone $reader;
+  $entity_reader->request->set_parameter('data', $type);
+
+  $link = l(t('General results'), $entity_reader->getUrl());
+
+  return $link;
 }
