@@ -267,7 +267,7 @@ function dc_apps_app_delete_submit($form, &$form_state) {
   $form_state['#entity']->delete();
 
   // Show message.
-  drupal_set_message(t('The app @name has deleted sucesfully', array('@name' => $form_state['#entity']->title)));
+  drupal_set_message(t('The app @name has deleted successfully', array('@name' => $form_state['#entity']->title)));
 
   // Redirect user.
   $form_state['redirect'] = 'admin/apps';
