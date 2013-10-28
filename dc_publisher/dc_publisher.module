@@ -274,6 +274,8 @@ function dc_publisher_supply_information() {
   }
 
   // Supply the information.
+  // TODO: Add how much results were found. This will be used when people pull
+  // information in batches.
   drupal_json_output(entity_load($_GET['data'], array_keys($result[$_GET['data']])));
 }
 
@@ -608,10 +610,53 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
     ->SetOauthRequest()
     ->SetSignatureParameter();
 
-  $entity_reader = clone $reader;
-  $entity_reader->request->set_parameter('data', $type);
+  $reader->request->set_parameter('data', $type);
 
-  $link = l(t('General results'), $entity_reader->getUrl());
+  $information = array(
+    array(
+      'title' => t('General'),
+      'description' => t('Displaying all the results for this entity.'),
+      'link_parameters' => array(
+      ),
+    ),
+    array(
+      'title' => t('Search'),
+      'description' => t('When creating an app you select a field and operator. Using the search variable you can reduce results.'),
+      'link_parameters' => array(
+        'search' => 'foo',
+      ),
+    ),
+    array(
+      'title' => t('Pager'),
+      'description' => t('Each call return 25 results. When you have more then 25 results you can use the pager value. <i>Notice: The first start from 0, the second is 1</i>'),
+      'link_parameters' => array(
+        'page' => '1',
+      ),
+    ),
+  );
 
-  return $link;
+  $content = '';
+  foreach ($information as $info) {
+
+    foreach ($info['link_parameters'] as $key => $value) {
+      $reader->request->set_parameter($key, $value);
+    }
+
+    $url = l(t('Watch results'), $reader->getUrl());
+
+    // TODO: Move into theme function and add style.
+    $content .= "
+      <div>
+        <p>{$info['title']}</p>
+        <p>{$info['description']}</p>
+        <p>{$url}</p>
+      </div>
+    ";
+
+    foreach (array_keys($info['link_parameters']) as $key) {
+      $reader->request->unset_parameter($key);
+    }
+  }
+
+  return $content;
 }
