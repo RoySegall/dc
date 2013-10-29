@@ -180,6 +180,23 @@ function dc_publisher_entity_delete($entity, $type) {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function dc_publisher_theme() {
+  return array(
+    'admin_app_documentation' => array(
+      'variables' => array(
+        'title' => NULL,
+        'description' => NULL,
+        'url' => NULL,
+      ),
+      'template' => 'admin-app-documentation',
+      'path' => drupal_get_path('module', 'dc_publisher') . '/templates'
+    ),
+  );
+}
+
+/**
  * Return the basic address of the the site oauth publisher page.
  */
 function dc_publisher_base_url() {
@@ -644,14 +661,12 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
 
     $url = l(t('Watch results'), $reader->getUrl());
 
-    // TODO: Move into theme function and add style.
-    $content .= "
-      <div>
-        <p>{$info['title']}</p>
-        <p>{$info['description']}</p>
-        <p>{$url}</p>
-      </div>
-    ";
+    // TODO: Add option to see raw URL or how to use the DrupalConnect class.
+    $content .= theme('admin_app_documentation', array(
+      'title' => $info['title'],
+      'description' => $info['description'],
+      'url' => $url,
+    ));
 
     foreach (array_keys($info['link_parameters']) as $key) {
       $reader->request->unset_parameter($key);
