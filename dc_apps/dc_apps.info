@@ -2,8 +2,8 @@ name = Drupal connect apps
 description = Manage the apps that can use the information from you drupal site.
 core = 7.x
 
-dependencies[] = dc
 dependencies[] = entity
 dependencies[] = oauth_common
 
 files[] = includes/dc_apps.entity.inc
+files[] = includes/DrupalConnectReader.inc

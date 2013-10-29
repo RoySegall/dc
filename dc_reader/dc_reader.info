@@ -2,5 +2,6 @@ name = Drupal connect reader
 description = API module that can read the information of other drupal site.
 core = 7.x
 
+dependencies[] = dc_apps
 dependencies[] = entity
 dependencies[] = oauth_common
