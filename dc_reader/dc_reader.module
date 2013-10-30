@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @file
+ * Module file for the Drupal connect reader.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function dc_reader_menu() {
+  $items = array();
+
+  $items['admin/config/services/apps-settings'] = array(
+    'title' => 'Drupal reader connect',
+    'description' => 'Manage Drupal reader connect settings',
+    'access arguments' => array('manage dc reader settings'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dc_reader_settings'),
+  );
+
+  $items['processor'] = array(
+    'title' => 'Process',
+    'description' => 'process the information',
+    'access callback' => TRUE,
+    'page callback' => 'dc_reader_process',
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function dc_reader_permission() {
+  return array(
+    'manage dc reader settings' => array(
+      'title' => t('Manage Drupal reader settings'),
+      'description' => t('Grant the user permission to manage the Drupal reader permission.')
+    ),
+  );
+}
+
+/**
+ * Manage settings.
+ */
+function dc_reader_settings($form, $form_state) {
+  return $form;
+}
+
+/**
+ * Process the information which came form other drupal sites.
+ *
+ * The connect with button work by the next steps:
+ *  1.  Send the user to the drupal site which we "Connect with"
+ *  2.  The site verify the key, secret and signature. If the validation passed
+ *      A unique session in the site created.
+ *  3.  The user return back to this site with the session.
+ *  4.  With that session we call the a menu item which return the user info
+ *  5.  Checking if the user exists in the site, if not create it and bind him
+ *      to the app. If the user already binned just logging in. If the username
+ *      already taken then the user need to select a new username.
+ *
+ * Notice: Once the session is created, it could be used to 30 seconds only.
+ * After that the session will be delete, trying to pull user data with that
+ * session will be invalid.
+ */
+function dc_reader_process() {
+}
