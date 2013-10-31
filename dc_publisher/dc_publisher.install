@@ -47,5 +47,36 @@ function dc_publisher_schema() {
     'primary key' => array('id'),
   );
 
+  $schema['authorized_sessions'] = array(
+    'description' => 'Save allowed session apps for loading user information.',
+    'fields' => array(
+      'id' => array(
+        'description' => 'The identifier.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'app_id' => array(
+        'description' => 'The primary identifier for a applications.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'session' => array(
+        'description' => 'The session string.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'timestamp' => array(
+        'description' => 'The Unix timestamp when the entry was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+
   return $schema;
 }
