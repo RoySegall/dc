@@ -290,10 +290,19 @@ function dc_publisher_supply_information() {
     drupal_json_output(t('No data were found according to you search curatorial.'));
   }
 
+  $content = '';
+  $resource = restws_resource_controller($_GET['data']);
+  $format = restws_format('json');
+
   // Supply the information.
   // TODO: Add how much results were found. This will be used when people pull
   // information in batches.
-  drupal_json_output(entity_load($_GET['data'], array_keys($result[$_GET['data']])));
+  foreach (array_keys($result[$_GET['data']]) as $id) {
+    $content[] = drupal_json_decode($format->viewResource($resource, $id, TRUE));
+  }
+
+  print $format->serialize($content);
+  drupal_add_http_header('Content-Type', $format->mimeType());
 }
 
 /**
