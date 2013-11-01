@@ -298,9 +298,11 @@ function dc_publisher_supply_information() {
   // TODO: Add how much results were found. This will be used when people pull
   // information in batches.
   foreach (array_keys($result[$_GET['data']]) as $id) {
+    // Un-serialized the data for building an array of results.
     $content[] = drupal_json_decode($format->viewResource($resource, $id, TRUE));
   }
 
+  // Print the serialized information.
   print $format->serialize($content);
   drupal_add_http_header('Content-Type', $format->mimeType());
 }
