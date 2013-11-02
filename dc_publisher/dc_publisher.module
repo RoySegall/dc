@@ -322,6 +322,35 @@ function dc_publisher_query_dc_publisher_approved_apps_alter(QueryAlterableInter
 }
 
 /**
+ * verify that the user approve the app.
+ *
+ * @param DrupalConnectApps $app
+ *  The app object.
+ * @param $account
+ *  The account of the user.*  The account of the user.
+ *
+ * @return bool
+ *  True or false if the user approved the app.
+ */
+function dc_publisher_approved_app(DrupalConnectApps $app, $account = NULL) {
+  if (!$account) {
+    global $user;
+    $account = user_load($account);
+  }
+
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'approved_apps')
+    ->propertyCondition('uid', $account->uid)
+    ->propertyCondition('app_id', $app->id)
+    ->propertyCondition('status', 1)
+    ->execute();
+
+  return !empty($result['approved_apps']);
+}
+
+
+/**
  * A client asked to connect with a user - supply the information about the
  * user.
  */
@@ -344,8 +373,10 @@ function dc_publisher_connect_with() {
     return;
   }
 
-  if (!dc_apps_user_approved_apps($app)) {
+  if (!dc_publisher_approved_app($app)) {
     // Redirect the user to approve the app.
+    drupal_goto('apps/' . $app->id . '/user_approve_app');
+    return;
   }
 
   drupal_json_output($user);
@@ -464,6 +495,16 @@ function dc_publisher_user_approve_app_submit($form, &$form_state) {
   $approve->save();
 
   drupal_set_message(t('The app @name has been approved. Thank you.', array('@name' => $app->title)));
+
+  if (!empty($_SESSION['dc_publisher'])) {
+    $query = array(
+      'key' => $_SESSION['dc_publisher']['key'],
+      'secret' => $_SESSION['dc_publisher']['secret'],
+      'signature' => $_SESSION['dc_publisher']['signature'],
+    );
+
+    drupal_goto('dc-connect', array('query' => $query));
+  }
 }
 
 /**
