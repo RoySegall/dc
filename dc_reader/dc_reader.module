@@ -11,7 +11,7 @@
 function dc_reader_menu() {
   $items = array();
 
-  $items['admin/config/services/apps-settings'] = array(
+  $items['admin/config/services/reader-settings'] = array(
     'title' => 'Drupal reader connect',
     'description' => 'Manage Drupal reader connect settings',
     'access arguments' => array('manage dc reader settings'),
@@ -43,10 +43,67 @@ function dc_reader_permission() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function dc_reader_theme() {
+  return array(
+    'dc_reader_login_button' => array(
+      'variables' => array(
+        'mode' => NULL,
+      ),
+    ),
+  );
+}
+
+/**
  * Manage settings.
  */
 function dc_reader_settings($form, $form_state) {
-  return $form;
+  $form['dc_reader_site_address'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Site address'),
+    '#description' => t('Enter the site address of a drupal site for remote login.'),
+    '#default_value' => variable_get('dc_reader_site_address', ''),
+  );
+
+  $form['dc_reader_public_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Public key'),
+    '#description' => t('Please fill on the public key.'),
+    '#default_value' => variable_get('dc_reader_public_key', ''),
+  );
+
+  $form['dc_reader_secret_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Secret key'),
+    '#description' => t('Please fill on the secret key.'),
+    '#default_value' => variable_get('dc_reader_secret_key', ''),
+  );
+
+  $form['dc_reader_button_style'] = array(
+    '#type' => 'radios',
+    '#title' => t('Connect button style'),
+    '#description' => t('Select the way you would like to display the connect button.'),
+    '#options' => array(
+      '--none--' => t('None - you supply the button yourself.'),
+      'link' => t('Link - display a link before the submit button.'),
+    ),
+    '#default_value' => variable_get('dc_reader_button_style', 'link'),
+  );
+
+  $form['dc_reader_link_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Login link title'),
+    '#description' => t('You chose to use link for the login button. Please fill in the title.'),
+    '#default_value' => variable_get('dc_reader_link_title'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="dc_reader_button_style"]' => array('value' => 'link'),
+      ),
+    ),
+  );
+
+  return system_settings_form($form);
 }
 
 /**
@@ -67,4 +124,50 @@ function dc_reader_settings($form, $form_state) {
  * session will be invalid.
  */
 function dc_reader_process() {
+}
+
+/**
+ * Theme callback - generate an oAuth connect link.
+ *
+ * @param $variables
+ *  The way you would like to present the link. Default value is in the variable
+ *  dc_reader_button_style.
+ *
+ * @return String
+ *  HTML markup of the login link.
+ */
+function theme_dc_reader_login_button($variables = NULL) {
+  if (!$variables['mode']) {
+    $variables['mode'] = variable_get('dc_reader_button_style', 'link');
+  }
+
+  $mode = $variables['mode'];
+
+  if ($mode == 'link') {
+    return l(variable_get('dc_reader_link_title'), dc_reader_generate_link());
+  }
+}
+
+/**
+ * Generate the link for the session initialize request.
+ */
+function dc_reader_generate_link() {
+  $reader = new DrupalConnect(variable_get('dc_reader_public_key'), variable_get('dc_reader_secret_key'));
+
+  $reader
+    ->SetUrl(variable_get('dc_reader_site_address') . '?q=processor')
+    ->SetOauthRequest()
+    ->SetSignatureParameter();
+
+  return $reader->getUrl();
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function dc_reader_form_user_login_alter(&$form, &$form_state) {
+  $form['login'] = array(
+    '#type' => 'markup',
+    '#markup' => theme('dc_reader_login_button'),
+  );
 }
