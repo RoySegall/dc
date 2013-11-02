@@ -335,14 +335,14 @@ function dc_publisher_query_dc_publisher_approved_apps_alter(QueryAlterableInter
 function dc_publisher_approved_app(DrupalConnectApps $app, $account = NULL) {
   if (!$account) {
     global $user;
-    $account = user_load($account);
+    $account = user_load($user->uid);
   }
 
   $query = new EntityFieldQuery();
   $result = $query
     ->entityCondition('entity_type', 'approved_apps')
     ->propertyCondition('uid', $account->uid)
-    ->propertyCondition('app_id', $app->id)
+    ->propertyCondition('app_id', $app->identifier())
     ->propertyCondition('status', 1)
     ->execute();
 
@@ -358,7 +358,6 @@ function dc_publisher_connect_with() {
   global $user;
 
   $app = dc_apps_load_by_keys($_GET['key'], $_GET['secret']);
-
 
   $_SESSION['dc_publisher'] = array(
     'key' => $_GET['key'],
@@ -376,10 +375,10 @@ function dc_publisher_connect_with() {
   if (!dc_publisher_approved_app($app)) {
     // Redirect the user to approve the app.
     drupal_goto('apps/' . $app->id . '/user_approve_app');
-    return;
   }
 
-  drupal_json_output($user);
+  // Open a session in the DB and redirect the user back to the origin site with
+  // the value so he could pull the data.
 }
 
 /**
@@ -492,6 +491,7 @@ function dc_publisher_user_approve_app_submit($form, &$form_state) {
   $approve = dc_publisher_approved_apps_create();
   $approve->uid = $user->uid;
   $approve->app_id = $app->id;
+  $approve->status = 1;
   $approve->save();
 
   drupal_set_message(t('The app @name has been approved. Thank you.', array('@name' => $app->title)));
