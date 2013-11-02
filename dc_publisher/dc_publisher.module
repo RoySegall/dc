@@ -35,7 +35,7 @@ function dc_publisher_menu() {
     'page callback' => 'dc_publisher_supply_information',
   );
 
-  $items['dc/connect'] = array(
+  $items['dc-connect'] = array(
     'title' => 'Connect',
     'description' => 'Allow to pull information from user',
     'access callback' => 'dc_publisher_oatuh_allowed',
@@ -199,10 +199,10 @@ function dc_publisher_theme() {
 /**
  * Return the basic address of the the site oauth publisher page.
  */
-function dc_publisher_base_url() {
+function dc_publisher_base_url($q = 'publisher') {
   global $base_url;
 
-  return $base_url . '?q=publisher';
+  return $base_url . '?q=' . $q;
 }
 
 /**
@@ -215,7 +215,7 @@ function dc_publisher_oatuh_allowed() {
 
   $reader = new DrupalConnect($_GET['key'], $_GET['secret']);
   $reader
-    ->SetUrl(dc_publisher_base_url())
+    ->SetUrl(dc_publisher_base_url($_GET['q']))
     ->SetOauthRequest();
 
   return $reader->VerifySignature($_GET['signature']);
@@ -330,9 +330,18 @@ function dc_publisher_connect_with() {
 
   $app = dc_apps_load_by_keys($_GET['key'], $_GET['secret']);
 
+
+  $_SESSION['dc_publisher'] = array(
+    'key' => $_GET['key'],
+    'secret' => $_GET['secret'],
+    'signature' => $_GET['signature'],
+  );
+
   // Check that user is logged in.
   if (!user_is_logged_in()) {
     // Redirect the user for logging in.
+    drupal_goto('user/login');
+    return;
   }
 
   if (!dc_apps_user_approved_apps($app)) {
@@ -685,4 +694,25 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
   }
 
   return $content;
+}
+
+/**
+ * Implements hook_user_login().
+ *
+ * If the user has a dc_publisher information in the session then we need to
+ * redirect the user to approve the app.
+ * Submit handler - redirect the user to the Login with page.
+ */
+function dc_publisher_user_login(&$form, &$form_state) {
+  if (empty($_SESSION['dc_publisher'])) {
+    return;
+  }
+
+  $query = array(
+    'key' => $_SESSION['dc_publisher']['key'],
+    'secret' => $_SESSION['dc_publisher']['secret'],
+    'signature' => $_SESSION['dc_publisher']['signature'],
+  );
+
+  drupal_goto('dc-connect', array('query' => $query));
 }

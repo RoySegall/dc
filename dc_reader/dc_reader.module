@@ -155,7 +155,7 @@ function dc_reader_generate_link() {
   $reader = new DrupalConnect(variable_get('dc_reader_public_key'), variable_get('dc_reader_secret_key'));
 
   $reader
-    ->SetUrl(variable_get('dc_reader_site_address') . '?q=processor')
+    ->SetUrl(variable_get('dc_reader_site_address') . '?q=dc-connect')
     ->SetOauthRequest()
     ->SetSignatureParameter();
 
