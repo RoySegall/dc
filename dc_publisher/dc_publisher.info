@@ -8,3 +8,4 @@ dependencies[] = oauth_common
 dependencies[] = restws
 
 files[] = includes/dc_publisher.entity.inc
+files[] = includes/dc_publihser.EntityCore.inc

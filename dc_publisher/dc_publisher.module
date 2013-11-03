@@ -4,6 +4,9 @@
  * Main file of the module Drupal publisher publisher.
  */
 
+// Includes the entity api file integration.
+require_once 'includes/dc_publisher.EntityCore.inc';
+
 /**
  * Implements hook_menu().
  */
@@ -87,81 +90,6 @@ function dc_publisher_admin_paths() {
   return array(
     'user/*/apps/*/edit' => FALSE,
   );
-}
-
-/**
- * Implements hook_entity_info().
- */
-function dc_publisher_entity_info() {
-  return array(
-    'approved_apps' => array(
-      'label' => t('Approved app'),
-      'entity class' => 'DrupalPublisherApprovedApp',
-      'controller class' => 'EntityAPIController',
-      'base table' => 'approved_apps',
-      'entity keys' => array(
-        'id' => 'id',
-      ),
-      'load hook' => '',
-    ),
-  );
-}
-
-/**
- * Create Drupal publisher approved app entity.
- *
- * @param $data
- *  Initialize data of the Drupal publisher app.
- *
- * @return DrupalPublisherApprovedApp
- *  Initialized object a Drupal publisher approved app.
- */
-function dc_publisher_approved_apps_create($data = array()) {
-  global $user;
-
-  $data += array(
-    'uid' => $user->uid,
-    'timestamp' => REQUEST_TIME,
-  );
-
-  return entity_create('approved_apps', $data);
-}
-
-/**
- * Load multiple Drupal publisher approved app entity.
- *
- * @param $ids
- *  Array of Drupal publisher apps IDs.
- *
- * @return DrupalPublisherApprovedApp[]
- *  Array of Drupal publisher approved apps objects.
- */
-function dc_publisher_approved_apps_load_multiple($ids) {
-  return entity_load('approved_apps', $ids);
-}
-
-/**
- * Load a single Drupal publisher approved app entity.
- *
- * @param $id
- *  Id a Drupal publisher app entity.
- *
- * @return DrupalPublisherApprovedApp
- *  Drupal publisher approved apps object.
- */
-function dc_publisher_approved_apps_load($id) {
-  $entity = entity_load('approved_apps', array($id));
-  return reset($entity);
-}
-
-/**
- * Delete multiple Drupal publisher approved app entities.
- *
- * @param $ids
- *  List of Drupal publisher app IDs to delete.
- */
-function dc_publisher_approved_apps_delete_multiple($ids) {
-  entity_delete_multiple('approved_apps', $ids);
 }
 
 /**
@@ -375,10 +303,12 @@ function dc_publisher_connect_with() {
   if (!dc_publisher_approved_app($app)) {
     // Redirect the user to approve the app.
     drupal_goto('apps/' . $app->id . '/user_approve_app');
+    return;
   }
 
   // Open a session in the DB and redirect the user back to the origin site with
   // the value so he could pull the data.
+
 }
 
 /**
