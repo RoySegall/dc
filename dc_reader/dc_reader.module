@@ -124,6 +124,23 @@ function dc_reader_settings($form, $form_state) {
  * session will be invalid.
  */
 function dc_reader_process() {
+
+  // Get the session.
+  $session = $_GET['session'];
+
+  // Request from the publisher the user information with the session key.
+
+  // Check if there is an email from the publisher in this site.
+  $result = TRUE;
+
+  if ($result) {
+    // No user were found. Create first the user and pass the user to fill in
+    // his username.
+  }
+  else {
+    // The email from the publisher site is exists here. Because this is the
+    // same mail then the this is the user. Log in with that user.
+  }
 }
 
 /**

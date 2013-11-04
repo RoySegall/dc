@@ -8,6 +8,16 @@
 require_once 'includes/dc_publisher.EntityCore.inc';
 
 /**
+ * Implements hook_init().
+ *
+ * Delete authorized session which their timestamp is more 30 seconds from now.
+ *
+ * @TODO: Give the option to create debug mode.
+ */
+function dc_publisher_init() {
+}
+
+/**
  * Implements hook_menu().
  */
 function dc_publisher_menu() {
@@ -306,9 +316,9 @@ function dc_publisher_connect_with() {
     return;
   }
 
-  // Open a session in the DB and redirect the user back to the origin site with
-  // the value so he could pull the data.
+  // Create a session.
 
+  // Redirect the user back to to the response processor with the session.
 }
 
 /**
