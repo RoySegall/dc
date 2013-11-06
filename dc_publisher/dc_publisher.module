@@ -317,8 +317,20 @@ function dc_publisher_connect_with() {
   }
 
   // Create a session.
+  $session = dc_publisher_authorized_session_create();
+  $session->app_id = $app->id;
+  $session->sessionCreate($app->app_secret);
+  $session->save();
 
   // Redirect the user back to to the response processor with the session.
+  $query = array(
+    'q' => 'processor',
+    'session' => $session->session,
+    'key' => $app->app_key,
+    'secret' => $app->app_secret,
+  );
+
+  drupal_goto($app->app_site, array('query' => $query));
 }
 
 /**

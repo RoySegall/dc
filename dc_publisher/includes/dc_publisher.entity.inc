@@ -85,4 +85,14 @@ class DrupalPublisherAuthorizedSession extends Entity {
    * The Unix timestamp when the entry was created.
    */
   public $timestamp;
+
+  /**
+   * Create a session string.
+   *
+   * @param $secret
+   *  The secret key of the application.
+   */
+  public function sessionCreate($secret) {
+    $this->session = md5($secret . '_' . REQUEST_TIME);
+  }
 }

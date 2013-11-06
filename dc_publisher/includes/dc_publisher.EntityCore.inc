@@ -99,8 +99,6 @@ function dc_publisher_approved_apps_delete_multiple($ids) {
  *  Initialized object a Drupal publisher authorized sessions.
  */
 function dc_publisher_authorized_session_create($data = array()) {
-  global $user;
-
   $data += array(
     'timestamp' => REQUEST_TIME,
   );

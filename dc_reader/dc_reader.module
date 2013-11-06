@@ -124,6 +124,9 @@ function dc_reader_settings($form, $form_state) {
  * session will be invalid.
  */
 function dc_reader_process() {
+  if (empty($_GET['session'])) {
+    return;
+  }
 
   // Get the session.
   $session = $_GET['session'];
