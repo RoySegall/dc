@@ -47,6 +47,8 @@ function dc_publisher_schema() {
     'primary key' => array('id'),
   );
 
+
+  // TODO: Add user uid which bind the to the session.
   $schema['authorized_sessions'] = array(
     'description' => 'Save allowed session apps for loading user information.',
     'fields' => array(

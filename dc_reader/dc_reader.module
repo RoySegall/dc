@@ -131,7 +131,8 @@ function dc_reader_process() {
   // Get the session.
   $session = $_GET['session'];
 
-  // Request from the publisher the user information with the session key.
+  // Request from the publisher in the dc-connect menu item the user information
+  // with the session key.
 
   // Check if there is an email from the publisher in this site.
   $result = TRUE;
