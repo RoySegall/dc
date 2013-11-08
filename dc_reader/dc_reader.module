@@ -131,11 +131,17 @@ function dc_reader_process() {
   // Get the session.
   $session = $_GET['session'];
 
-  // Request from the publisher in the dc-connect menu item the user information
-  // with the session key.
+  // Request from the publisher the user information with the session key.
+  $reader = new DrupalConnect($_GET['key'], $_GET['secret']);
 
-  // Check if there is an email from the publisher in this site.
-  $result = TRUE;
+  $reader
+    ->SetUrl(variable_get('dc_reader_site_address') . '?q=publisher')
+    ->SetOauthRequest()
+    ->SetSignatureParameter();
+
+  $reader->request->set_parameter('session', $_GET['session']);
+
+  $result = $reader->getResult();
 
   if ($result) {
     // No user were found. Create first the user and pass the user to fill in
@@ -145,6 +151,8 @@ function dc_reader_process() {
     // The email from the publisher site is exists here. Because this is the
     // same mail then the this is the user. Log in with that user.
   }
+
+  return 'a';
 }
 
 /**

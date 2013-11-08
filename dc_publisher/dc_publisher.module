@@ -50,7 +50,7 @@ function dc_publisher_menu() {
 
   $items['dc-connect'] = array(
     'title' => 'Connect',
-    'description' => 'Allow to pull information from user',
+    'description' => 'Create authorized sessions for pulling information of the user',
     'access callback' => 'dc_publisher_oatuh_allowed',
     'page callback' => 'dc_publisher_connect_with',
   );
@@ -170,9 +170,31 @@ function dc_publisher_supply_information() {
     drupal_json_output(t("App with the key and secret wasn't found"));
   }
 
+  // Accessing via session. Get the session user information of that session.
+  if (isset($_GET['session'])) {
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->entityCondition('entity_type', 'authorized_sessions')
+      ->propertyCondition('app_id', $app->id)
+      ->propertyCondition('session', $_GET['session'])
+      ->execute();
+
+    if (empty($result['authorized_sessions'])) {
+      drupal_json_output(t('No data were found. Try another search criteria.'));
+      return;
+    }
+
+    $session = dc_publisher_authorized_sessions_load(reset(array_keys($result['authorized_sessions'])));
+
+    $session->getUserInfo(TRUE);
+    return;
+  }
+
   if (!in_array($_GET['data'], array_keys($app->need))) {
     drupal_json_output(t("The @data information you selected cannot be supplied due to app settings.", array('@data' => $_GET['data'])));
   }
+
+  // Check and verify if the is a session for asking a single user information.
 
   // Start the query.
   $query = new entityFieldQuery();
@@ -319,6 +341,7 @@ function dc_publisher_connect_with() {
   // Create a session.
   $session = dc_publisher_authorized_session_create();
   $session->app_id = $app->id;
+  $session->uid = $user->uid;
   $session->sessionCreate($app->app_secret);
   $session->save();
 
@@ -328,6 +351,7 @@ function dc_publisher_connect_with() {
     'session' => $session->session,
     'key' => $app->app_key,
     'secret' => $app->app_secret,
+    'signature' => $_GET['signature'],
   );
 
   drupal_goto($app->app_site, array('query' => $query));
