@@ -235,11 +235,13 @@ function dc_reader_register_form_submit($form, &$form_state) {
   //the first parameter is left blank so a new user is created
   $account = user_save('', $fields);
 
-  // Display message and redirect the user to reset the password.
+  // Display message, redirect the user to reset the password and destroy the
+  // session.
   $params = array(
     '%name' => $form_state['values']['name'],
   );
   drupal_set_message(t('Hello %name, you create your account successfully.', $params));
+  unset($_SESSION['reader_result']);
   drupal_goto(user_pass_reset_url($account));
 }
 
