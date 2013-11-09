@@ -130,16 +130,29 @@ class DrupalConnect {
 
   /**
    * Return the results from the oAuth provider.
+   *
+   * @param $data
+   *  Determine if the the function should display only the supplied information
+   *  form the publisher.
+   *
+   * @return Array
+   *  Return all the information the publisher return to supplied - status the
+   *  request, header information and the data.
    */
-  public function getResult() {
+  public function getResult($data = FALSE) {
     $headers = array(
       'Authorization' => 'Oauth',
-      'Content-type' => 'application/x-www-form-urlencoded',
+      'Content-type' => 'application/json',
     );
 
-    $url = $this->getUrl();
+    $result = drupal_http_request($this->getUrl(), array('headers' => $headers, 'method' => 'GET'));
 
-    return drupal_http_request($url, array('headers' => $headers, 'method' => 'GET'));
+    if ($data) {
+      // Decode the JSON the publisher supplied to us.
+      return drupal_json_decode($result->data);
+    }
+
+    return $result;
   }
 
   /**

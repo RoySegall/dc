@@ -184,7 +184,8 @@ function dc_publisher_supply_information() {
       return;
     }
 
-    $session = dc_publisher_authorized_sessions_load(reset(array_keys($result['authorized_sessions'])));
+    $keys = array_keys($result['authorized_sessions']);
+    $session = dc_publisher_authorized_sessions_load(reset($keys));
 
     $session->getUserInfo(TRUE);
     return;

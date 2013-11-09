@@ -117,10 +117,13 @@ class DrupalPublisherAuthorizedSession extends Entity {
    *  Array of the user information.
    */
   function getUserInfo($output = FALSE) {
+    // We wan't to display all the information but rest checking the permision
+    // for every property. We need to by pass that.
+
     $resource = restws_resource_controller('user');
     $format = restws_format('json');
 
-    $content = drupal_json_decode($format->viewResource($resource, $this->uid, TRUE));
+    $content = drupal_json_decode($format->viewResource($resource, $this->uid));
 
     if ($output) {
       drupal_json_output($content);
