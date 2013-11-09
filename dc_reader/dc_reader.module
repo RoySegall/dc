@@ -27,6 +27,13 @@ function dc_reader_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['reader/register_user'] = array(
+    'title' => 'Register a new user',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dc_reader_register_form'),
+    'access callback' => 'dc_reader_register_access',
+  );
+
   return $items;
 }
 
@@ -137,7 +144,6 @@ function dc_reader_process() {
     ->SetSignatureParameter();
 
   $reader->request->set_parameter('session', $_GET['session']);
-
   $result = $reader->getResult(TRUE);
 
   if ($account = user_load_by_mail($result['mail'])) {
@@ -152,19 +158,89 @@ function dc_reader_process() {
     drupal_set_message(t('Hello %username, you logged successfully via the connect with option.'));
   }
   else {
-    drupal_set_title(t('Register as a new user'), PASS_THROUGH);
-    // No user were found. Create first the user and pass the user to fill in
-    // his username.
-
-    return drupal_get_form('dc_reader_register_form', $result);
+    $_SESSION['reader_result'] = $result;
+    drupal_goto('reader/register_user');
   }
 }
 
 /**
- * Register a new user form.
+ * Access callback - check if we need to register that logged via the connect
+ * with button.
  */
-function dc_reader_register_form($form, $form_state, $results) {
-  // TODO: Add register form.
+function dc_reader_register_access() {
+  return isset($_SESSION['reader_result']);
+}
+
+/**
+ * Register a new user form.
+ *
+ * Just the password and the
+ */
+function dc_reader_register_form($form, $form_state) {
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Username'),
+    '#required' => TRUE,
+    '#description' => t('Please enter a user name.'),
+    '#default_value' => $_SESSION['reader_result']['name'],
+  );
+
+  $form['email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('E-mail'),
+    '#value' => $_SESSION['reader_result']['mail'],
+    '#disabled' => TRUE,
+  );
+
+  $form['actions'] = array(
+    'submit' => array(
+      '#type' => 'submit',
+      '#value' => t('Register'),
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * Validate the username is not taken.
+ */
+function dc_reader_register_form_validate($form, $form_state) {
+  if (user_load_by_name($form_state['values']['name'])) {
+    form_set_error('name', t('The user name is already taken.'));
+  }
+  elseif (user_load_by_mail($form_state['values']['email'])) {
+    form_set_error('email', t('The email is already taken.'));
+  }
+}
+
+/**
+ * register the user, bind him with the original mail and redirect him to reset
+ * the password.
+ */
+function dc_reader_register_form_submit($form, &$form_state) {
+  $pass = user_password(8);
+
+  //set up the user fields
+  $fields = array(
+    'name' => $form_state['values']['name'],
+    'mail' => $form_state['values']['email'],
+    'pass' => $pass,
+    'status' => 1,
+    'roles' => array(
+      DRUPAL_AUTHENTICATED_RID => 'authenticated user',
+    ),
+  );
+
+  //the first parameter is left blank so a new user is created
+  $account = user_save('', $fields);
+
+  // Display message and redirect the user to reset the password.
+  $params = array(
+    '%name' => $form_state['values']['name'],
+  );
+  drupal_set_message(t('Hello %name, you create your account successfully.', $params));
+  drupal_goto(user_pass_reset_url($account));
 }
 
 /**
