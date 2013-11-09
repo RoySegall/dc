@@ -128,9 +128,6 @@ function dc_reader_process() {
     return;
   }
 
-  // Get the session.
-  $session = $_GET['session'];
-
   // Request from the publisher the user information with the session key.
   $reader = new DrupalConnect($_GET['key'], $_GET['secret']);
 
@@ -141,18 +138,33 @@ function dc_reader_process() {
 
   $reader->request->set_parameter('session', $_GET['session']);
 
-  $result = $reader->getResult();
+  $result = $reader->getResult(TRUE);
 
-  if ($result) {
-    // No user were found. Create first the user and pass the user to fill in
-    // his username.
+  if ($account = user_load_by_mail($result['mail'])) {
+    // The email from the publisher site is exists here. A user with that mail
+    // already exists. Log in with that user.
+    global $user;
+    $user = $account;
+    drupal_session_regenerate();
+    drupal_goto('<front>');
+
+    // Set the message.
+    drupal_set_message(t('Hello %username, you logged successfully via the connect with option.'));
   }
   else {
-    // The email from the publisher site is exists here. Because this is the
-    // same mail then the this is the user. Log in with that user.
-  }
+    drupal_set_title(t('Register as a new user'), PASS_THROUGH);
+    // No user were found. Create first the user and pass the user to fill in
+    // his username.
 
-  return 'a';
+    return drupal_get_form('dc_reader_register_form', $result);
+  }
+}
+
+/**
+ * Register a new user form.
+ */
+function dc_reader_register_form($form, $form_state, $results) {
+  // TODO: Add register form.
 }
 
 /**
