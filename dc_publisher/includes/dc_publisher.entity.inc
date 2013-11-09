@@ -117,11 +117,14 @@ class DrupalPublisherAuthorizedSession extends Entity {
    *  Array of the user information.
    */
   function getUserInfo($output = FALSE) {
-    // We wan't to display all the information but rest checking the permision
-    // for every property. We need to by pass that.
-
     $resource = restws_resource_controller('user');
     $format = restws_format('json');
+
+    // Rest checking if anonymous users can see property of the user object.
+    // We know that anonymous users which passed the oAuth authentication can
+    // see any property of the user object. When setting the filter variable to
+    // FALSE we assure that every one can access the properties.
+    $format::setFilter(FALSE);
 
     $content = drupal_json_decode($format->viewResource($resource, $this->uid));
 

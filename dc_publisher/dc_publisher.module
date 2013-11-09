@@ -6,6 +6,7 @@
 
 // Includes the entity api file integration.
 require_once 'includes/dc_publisher.EntityCore.inc';
+require_once 'includes/dc_publisher.formats.inc';
 
 /**
  * Implements hook_init().
@@ -115,6 +116,18 @@ function dc_publisher_entity_delete($entity, $type) {
   }
 
   // TODO: Do. http://www.youtube.com/watch?v=Ra70O9nps6E
+}
+
+/**
+ * Implements hook_restws_format_info().
+ *
+ * Take control of the json format handler due to access by passing the module
+ * need to do.
+ *
+ * @see DrupalConnectPublisherRestFormat::getData()
+ */
+function dc_publisher_restws_format_info_alter(&$info) {
+  $info['json']['class'] = 'DrupalConnectPublisherRestFormat';
 }
 
 /**
