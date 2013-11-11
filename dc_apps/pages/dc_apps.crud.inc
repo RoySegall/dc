@@ -31,10 +31,15 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
   // Get the entities and sort them in alphabetical order.
   $entities = entity_get_info();
 
-  // TODO: Add hook to hide entities so we could exclude information.
   ksort($entities);
+  $ignored = dc_apps_ignored_apps();
 
   foreach ($entities as $name => $info) {
+    if (in_array($name, $ignored)) {
+      // This entity should be displayed to the app creator.
+      continue;
+    }
+
     $need_info = empty($app->need[$name]) ? array() : $app->need[$name];
 
     $form['need'][$name][$name . '_need'] = array(
