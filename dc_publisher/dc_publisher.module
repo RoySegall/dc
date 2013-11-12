@@ -150,10 +150,23 @@ function dc_publisher_authorized_session_delete_multiple($ids) {
  * Implements hook_init().
  *
  * Delete authorized session which their timestamp is more 30 seconds from now.
- *
- * @TODO: Give the option to create debug mode.
  */
 function dc_publisher_init() {
+  if (variable_get('dc_publisher_session_debug', FALSE)) {
+    return;
+  }
+
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'authorized_sessions')
+    ->propertyCondition('timestamp', time() - 30, '<')
+    ->execute();
+
+  if (empty($result['authorized_sessions'])) {
+    return;
+  }
+
+  dc_publisher_authorized_session_delete_multiple(array_keys($result['authorized_sessions']));
 }
 
 /**
@@ -884,4 +897,16 @@ function dc_publisher_user_login(&$form, &$form_state) {
   );
 
   drupal_goto('dc-connect', array('query' => $query));
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function dc_publisher_form_dc_apps_settings_alter(&$form, $form_state) {
+  $form['dc_publisher_session_debug'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Authorized session debug mode'),
+    '#description' => t('When turned on, authorized session of apps will not be deleted. This could helpful when developing a Drupal connect app.'),
+    '#default_value' => variable_get('dc_publisher_session_debug', FALSE),
+  );
 }
