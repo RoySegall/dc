@@ -274,7 +274,26 @@ function dc_publisher_entity_delete($entity, $type) {
     return;
   }
 
-  // TODO: Do. http://www.youtube.com/watch?v=Ra70O9nps6E
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'approved_apps')
+    ->propertyCondition('app_id', $entity->id)
+    ->execute();
+
+  // Didn't found any approvals for this app.
+  if (empty($result['approved_apps'])) {
+    return;
+  }
+
+  $approval_keys = array_keys($result['approved_apps']);
+
+  if (count($approval_keys) >= 250) {
+    // Use queue.
+  }
+  else {
+    // Delete all at once.
+    dc_publisher_approved_apps_delete_multiple($approval_keys);
+  }
 }
 
 /**
