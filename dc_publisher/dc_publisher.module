@@ -196,14 +196,14 @@ function dc_publisher_menu() {
   $items['publisher'] = array(
     'title' => 'Publisher',
     'description' => 'Supplying JSON information for an app',
-    'access callback' => 'dc_publisher_oatuh_allowed',
+    'access callback' => 'dc_publisher_oauth_allowed',
     'page callback' => 'dc_publisher_supply_information',
   );
 
   $items['dc-connect'] = array(
     'title' => 'Connect',
     'description' => 'Create authorized sessions for pulling information of the user',
-    'access callback' => 'dc_publisher_oatuh_allowed',
+    'access callback' => 'dc_publisher_oauth_allowed',
     'page callback' => 'dc_publisher_connect_with',
   );
 
@@ -326,7 +326,7 @@ function dc_publisher_get_app_approval($id, $range = NULL) {
     return;
   }
 
-  return array_keys($result['approved_apps']);;
+  return array_keys($result['approved_apps']);
 }
 
 /**
@@ -400,9 +400,9 @@ function dc_publisher_base_url($q = 'publisher') {
 }
 
 /**
- * When oatuh want to pull data he need to pass the oauth signature test.
+ * When oauth want to pull data he need to pass the oauth signature test.
  */
-function dc_publisher_oatuh_allowed() {
+function dc_publisher_oauth_allowed() {
   if (!isset($_GET['key']) || !isset($_GET['secret'])) {
     return;
   }
