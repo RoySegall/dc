@@ -274,10 +274,51 @@ function dc_publisher_entity_delete($entity, $type) {
     return;
   }
 
+  // Get all the approval keys.
+  if (!$approval_keys = dc_publisher_get_app_approval($entity->id)) {
+    return;
+  }
+
+  if (count($approval_keys) >= 250) {
+    // More then 250, Do this in batch.
+    $queue = DrupalQueue::get('dc_publisher_remove_approvals');
+    $data = array(
+      'app_id' => $entity->id,
+    );
+
+    // Set the queue worker for deleting the first 250 approvals.
+    return $queue->createItem($data);
+  }
+  else {
+    // Delete all at once.
+    dc_publisher_approved_apps_delete_multiple($approval_keys);
+  }
+}
+
+/**
+ * Return list of approval IDs for a specific app ID.
+ *
+ * @param $id
+ *  The app ID.
+ * @param $range
+ *  Number of approval to get at once.
+ *
+ * @return array
+ *  List of approval IDs.
+ */
+function dc_publisher_get_app_approval($id, $range = NULL) {
   $query = new EntityFieldQuery();
-  $result = $query
+  $query
     ->entityCondition('entity_type', 'approved_apps')
-    ->propertyCondition('app_id', $entity->id)
+    ->propertyCondition('app_id', $id);
+
+  // Using range - take only the first X approval from the DB.
+  if ($range) {
+    $query->range(0, $range);
+  }
+
+  $result = $query
+    ->propertyOrderBy('id', 'ASC')
     ->execute();
 
   // Didn't found any approvals for this app.
@@ -285,15 +326,39 @@ function dc_publisher_entity_delete($entity, $type) {
     return;
   }
 
-  $approval_keys = array_keys($result['approved_apps']);
+  return array_keys($result['approved_apps']);;
+}
 
-  if (count($approval_keys) >= 250) {
-    // Use queue.
+/**
+ * Implements hook_cron_queue_info().
+ */
+function dc_publisher_cron_queue_info() {
+  $items['dc_publisher_remove_approvals'] = array(
+    'title' => t('Drupal connect publisher remove approval'),
+    'worker callback' => 'dc_publisher_remove_approvals',
+    'time' => 60,
+  );
+  return $items;
+}
+
+/**
+ * Queue worker callback function.
+ */
+function dc_publisher_remove_approvals($data) {
+  if (!$approval_keys = dc_publisher_get_app_approval($data['app_id'], 250)) {
+    return;
   }
-  else {
-    // Delete all at once.
-    dc_publisher_approved_apps_delete_multiple($approval_keys);
-  }
+
+  // Delete the apps.
+  dc_publisher_approved_apps_delete_multiple($approval_keys);
+
+  // Set the next batch.
+  $queue = DrupalQueue::get('dc_publisher_remove_approvals');
+  $data = array(
+    'app_id' => $data['id'],
+  );
+
+  return $queue->createItem($data);
 }
 
 /**
