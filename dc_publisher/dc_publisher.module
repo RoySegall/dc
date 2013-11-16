@@ -386,6 +386,7 @@ function dc_publisher_theme() {
         'tab_id' => NULL,
         'raw_url' => NULL,
         'code' => NULL,
+        't' => array(),
       ),
       'template' => 'admin-app-documentation',
       'path' => drupal_get_path('module', 'dc_publisher') . '/templates'
@@ -976,6 +977,10 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
       'tab_id' => $tab_id,
       'code' => highlight_string("<?php\n\techo 'soon';", TRUE),
       'raw_url' =>  $reader->getUrl(),
+      't' => array(
+        'code' => t('Code'),
+        'url' => t('URL'),
+      ),
     ));
 
     foreach (array_keys($info['link_parameters']) as $key) {
