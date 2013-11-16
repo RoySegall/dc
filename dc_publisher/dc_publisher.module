@@ -383,6 +383,9 @@ function dc_publisher_theme() {
         'title' => NULL,
         'description' => NULL,
         'url' => NULL,
+        'tab_id' => NULL,
+        'raw_url' => NULL,
+        'code' => NULL,
       ),
       'template' => 'admin-app-documentation',
       'path' => drupal_get_path('module', 'dc_publisher') . '/templates'
@@ -950,7 +953,12 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
     ),
   );
 
+  drupal_add_library('system', 'ui.tabs');
+  drupal_add_js(drupal_get_path('module', 'dc_publisher') . '/js/dc_publisher.js');
+  drupal_add_css(drupal_get_path('module', 'dc_publisher') . '/css/dc_publisher.css');
+
   $content = '';
+  $tabs = array();
   foreach ($information as $info) {
 
     foreach ($info['link_parameters'] as $key => $value) {
@@ -959,17 +967,24 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
 
     $url = l(t('Watch results'), $reader->getUrl());
 
-    // TODO: Add option to see raw URL or how to use the DrupalConnect class.
+    $tab_id = strtolower(str_replace(array(' ', '-'), '_', $info['title']));
+    $tabs[] = $tab_id;
     $content .= theme('admin_app_documentation', array(
       'title' => $info['title'],
       'description' => $info['description'],
       'url' => $url,
+      'tab_id' => $tab_id,
+      'code' => highlight_string("<?php\n\techo 'soon';", TRUE),
+      'raw_url' =>  $reader->getUrl(),
     ));
 
     foreach (array_keys($info['link_parameters']) as $key) {
       $reader->request->unset_parameter($key);
     }
   }
+
+  // Add the tabs ID for the JS settings to apply the jQuery UI tabs effect.
+  drupal_add_js(array('dc_publisher_tabs' => $tabs), 'setting');
 
   return $content;
 }
