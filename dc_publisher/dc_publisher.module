@@ -931,6 +931,15 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
 
   $reader->request->set_parameter('data', $type);
 
+  $code = '
+<?php
+  $reader = new DrupalConnect($app_key, $app_secret);
+  $reader
+    ->SetUrl($url)
+    ->SetOauthRequest()
+    ->SetSignatureParameter();
+  $reader->request->set_parameter(\'data\', $data_type);';
+
   $information = array(
     array(
       'title' => t('General'),
@@ -960,11 +969,16 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
 
   $content = '';
   $tabs = array();
+  $new_code = $code;
   foreach ($information as $info) {
+    $new_code .= "\n";
 
     foreach ($info['link_parameters'] as $key => $value) {
       $reader->request->set_parameter($key, $value);
+      $new_code .= '  $reader->request->set_parameter("' . $key . '", "' . $value . '");' . "\n";
     }
+
+    $new_code .= '  $result = $reader->getResult();' . "\n";
 
     $url = l(t('Watch results'), $reader->getUrl());
 
@@ -975,7 +989,7 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
       'description' => $info['description'],
       'url' => $url,
       'tab_id' => $tab_id,
-      'code' => highlight_string("<?php\n\techo 'soon';", TRUE),
+      'code' => highlight_string($new_code, TRUE),
       'raw_url' =>  $reader->getUrl(),
       't' => array(
         'code' => t('Code'),
@@ -986,6 +1000,8 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
     foreach (array_keys($info['link_parameters']) as $key) {
       $reader->request->unset_parameter($key);
     }
+
+    $new_code = $code;
   }
 
   // Add the tabs ID for the JS settings to apply the jQuery UI tabs effect.
