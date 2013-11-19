@@ -13,6 +13,9 @@
   .dc_publisher_tabs #code {
     border: #ccc solid 1px;
     border-top: none; }
+  .dc_publisher_tabs #code {
+    overflow: auto;
+    height: 150px; }
   .dc_publisher_tabs .ui-state-active a {
     font-weight: bold !important; }
   .dc_publisher_tabs .ui-state-default .url,

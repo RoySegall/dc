@@ -22,11 +22,17 @@
     border-top: none;
   }
 
+  #code {
+    overflow: auto;
+    height: 150px;
+  }
+
   .ui-state-active a {
     font-weight: bold !important;
   }
 
   .ui-state-default {
+
     .url,
     .code {
       background: #e9e9e9 !important;
@@ -34,6 +40,7 @@
   }
 
   .ui-state-active {
+
     .code,
     .url {
       background: #fafafa !important;
