@@ -68,3 +68,28 @@ function hook_dc_apps_app_options_alter(&$items, DrupalConnectApps $app) {
  */
 function hook_dc_apps_access($access, DrupalConnectApps $app, $account) {
 }
+
+/**
+ * Implements hook_dc_apps_entity_ignore().
+ *
+ * Allow to module decide which apps can be selected when creating a new app.
+ *
+ * @return array
+ *  Array of entities machine name to be ignored when creating a new app.
+ */
+function hook_dc_apps_entity_ignore() {
+  return array(
+    'foo',
+    'bar',
+  );
+}
+
+/**
+ * Alter the list of the ignored apps.
+ *
+ * @param $implements
+ *  List of the entities machine name.
+ */
+function hook_dc_apps_entity_ignore_alter(&$implements) {
+  unset($implements['foo']);
+}
