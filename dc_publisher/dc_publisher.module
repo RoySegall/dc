@@ -36,6 +36,16 @@ function dc_publisher_entity_info() {
 }
 
 /**
+ * Implements hook_dc_apps_entity_ignore().
+ */
+function dc_publisher_dc_apps_entity_ignore() {
+  return array(
+    'approved_apps',
+    'authorized_sessions',
+  );
+}
+
+/**
  * Create Drupal publisher approved app entity.
  *
  * @param $data

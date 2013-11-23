@@ -23,6 +23,15 @@ function dc_apps_entity_info() {
 }
 
 /**
+ * Implements hook_dc_apps_entity_ignore().
+ */
+function dc_apps_dc_apps_entity_ignore() {
+  return array(
+    'dc_app',
+  );
+}
+
+/**
  * Create s Drupal connect app entity.
  *
  * @param $data
