@@ -387,13 +387,19 @@ function dc_apps_build_fields($entity) {
  * display there content.
  */
 function dc_apps_ignored_apps() {
-  // TODO: Static cache.
+  if ($ignore = cache_get('dc_apps_ignore')) {
+    // Information already cached - use him.
+    return $ignore->data;
+  }
 
   // Get all the entities which users are not allowed to access their entries.
   $ignore = module_invoke_all('dc_apps_entity_ignore');
 
   // Let other module to alter the list of entities.
   drupal_alter('dc_apps_entity_ignore', $ignore);
+
+  // Cache the ignored apps.
+  cache_set('dc_apps_ignore', $ignore);
 
   return $ignore;
 }
