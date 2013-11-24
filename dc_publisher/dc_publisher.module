@@ -465,15 +465,15 @@ function dc_publisher_supply_information() {
     drupal_json_output(t("The @data information you selected cannot be supplied due to app settings.", array('@data' => $_GET['data'])));
   }
 
-  // Check and verify if the is a session for asking a single user information.
 
   // Start the query.
   $query = new entityFieldQuery();
   $query->entityCondition('entity_type', $_GET['data']);
 
-  // When searching for users and the checkbox was checked only users which
-  // approve the app will be display in the search results.
+  // Check and verify if the is a session for asking a single user information.
   if (variable_get('apps_search_for_users_limit', FALSE) && $_GET['data'] == 'user') {
+    // When searching for users and the checkbox was checked only users which
+    // approve the app will be display in the search results.
     // Adding tag for altering query later on.
     $query->addTag('dc_publisher_approved_apps');
 
@@ -512,6 +512,14 @@ function dc_publisher_supply_information() {
   // Display in batches.
   $result_number = variable_get('apps_data_number', 25);
   $page = !empty($_GET['page']) ? $_GET['page'] * $result_number : 0;
+
+  // Clone the query object so we could how much results we found.
+  $count_query = clone $query;
+  $result_number = $count_query
+    ->count()
+    ->execute();
+
+  // Adding a batch.
   $query->range($page, $result_number);
 
   // Execute.
@@ -521,17 +529,24 @@ function dc_publisher_supply_information() {
     drupal_json_output(t('No data were found according to you search curatorial.'));
   }
 
-  $content = '';
+  $content = array(
+    'content' => array(),
+    'meta_data' => array(),
+  );
   $resource = restws_resource_controller($_GET['data']);
   $format = restws_format('json');
 
-  // Supply the information.
-  // TODO: Add how much results were found. This will be used when people pull
-  // information in batches.
+  // Supply the information in batches.
   foreach (array_keys($result[$_GET['data']]) as $id) {
     // Un-serialized the data for building an array of results.
-    $content[] = drupal_json_decode($format->viewResource($resource, $id, TRUE));
+    $content['content'][] = drupal_json_decode($format->viewResource($resource, $id, TRUE));
   }
+
+  // Add metadata.
+  $content['meta_data'] = array(
+    'global results' => $count_query,
+    'current results' => count($content['content']),
+  );
 
   // Print the serialized information.
   print $format->serialize($content);
