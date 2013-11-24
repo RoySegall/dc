@@ -515,7 +515,7 @@ function dc_publisher_supply_information() {
 
   // Clone the query object so we could how much results we found.
   $count_query = clone $query;
-  $result_number = $count_query
+  $result_count = $count_query
     ->count()
     ->execute();
 
@@ -529,7 +529,8 @@ function dc_publisher_supply_information() {
     drupal_json_output(t('No data were found according to you search curatorial.'));
   }
 
-  $content = array(
+  // Declare variables.
+  $info = array(
     'content' => array(),
     'meta_data' => array(),
   );
@@ -539,17 +540,19 @@ function dc_publisher_supply_information() {
   // Supply the information in batches.
   foreach (array_keys($result[$_GET['data']]) as $id) {
     // Un-serialized the data for building an array of results.
-    $content['content'][] = drupal_json_decode($format->viewResource($resource, $id, TRUE));
+    $info['content'][] = drupal_json_decode($format->viewResource($resource, $id, TRUE));
   }
 
   // Add metadata.
-  $content['meta_data'] = array(
-    'global results' => $count_query,
-    'current results' => count($content['content']),
+  $info['meta_data'] = array(
+    'global results' => $result_count,
+    'current results' => count($info['content']),
+    'page' => $page,
+    'per_page' => $result_number,
   );
 
   // Print the serialized information.
-  print $format->serialize($content);
+  print $format->serialize($info);
   drupal_add_http_header('Content-Type', $format->mimeType());
 }
 

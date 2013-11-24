@@ -149,7 +149,7 @@ class DrupalConnect {
 
     if ($data) {
       // Decode the JSON the publisher supplied to us.
-      return drupal_json_decode($result->data);
+      return drupal_json_decode($result->data['content']);
     }
 
     return $result;
