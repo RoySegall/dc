@@ -210,6 +210,13 @@ function dc_publisher_menu() {
     'page callback' => 'dc_publisher_supply_information',
   );
 
+  $items['poster'] = array(
+    'title' => 'Poster',
+    'description' => 'Posting information from an outside services.',
+    'access callback' => 'dc_publisher_oauth_allowed',
+    'page callback' => 'dc_publisher_post_information',
+  );
+
   $items['dc-connect'] = array(
     'title' => 'Connect',
     'description' => 'Create authorized sessions for pulling information of the user',
@@ -439,6 +446,8 @@ function dc_publisher_supply_information() {
     // No app found - return nothing.
     drupal_json_output(t("App with the key and secret wasn't found"));
   }
+
+  // See if the app has the get method checked.
 
   // Accessing via session. Get the session user information of that session.
   if (isset($_GET['session'])) {
