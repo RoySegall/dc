@@ -48,6 +48,22 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
       '#default_value' => empty($need_info) ? FALSE : TRUE,
     );
 
+    $form['need'][$name][$name . '_methods'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Actions'),
+      '#options' => array(
+        'get' => t('Get'),
+        'post' => t('Post'),
+      ),
+      '#attributes' => array('class' => array('container-inline')),
+      '#default_value' => !empty($need_info['methods']) ? $need_info['methods'] : array(),
+      '#states' => array(
+        'visible' => array(
+          ':input[name="' . $name . '_need"]' => array('checked' => TRUE),
+        ),
+      ),
+    );
+
     $form['need'][$name][$name . '_search'] = array(
       '#type' => 'select',
       '#title' => t('Search by'),
@@ -56,7 +72,7 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
       '#default_value' => empty($need_info['search']) ? '' : $need_info['search'],
       '#states' => array(
         'visible' => array(
-          ':input[name="' . $name . '_need"]' => array('checked' => TRUE),
+          ':input[name="' . $name . '_methods[get]"]' => array('checked' => TRUE),
         ),
       ),
     );
@@ -72,7 +88,7 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
       ),
       '#states' => array(
         'visible' => array(
-          ':input[name="' . $name . '_need"]' => array('checked' => TRUE),
+          ':input[name="' . $name . '_methods[get]"]' => array('checked' => TRUE),
         ),
       ),
     );
@@ -212,6 +228,7 @@ function dc_apps_app_form_submit($form, &$form_state) {
     }
 
     $need[$entity] = array(
+      'methods' => $values[$entity . '_methods'],
       'search' => $values[$entity . '_search'],
       'operator' => $values[$entity . '_operator'],
     );
