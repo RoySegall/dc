@@ -1,0 +1,8 @@
+name = Drupal connect
+description = A warpper module with shared resources.
+core = 7.x
+
+dependencies[] = entity
+dependencies[] = oauth_common
+
+files[] = includes/DrupalConnectReader.inc

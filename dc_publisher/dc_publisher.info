@@ -3,8 +3,6 @@ description = Send the information from your site to the requester after verific
 core = 7.x
 
 dependencies[] = dc_apps
-dependencies[] = entity
-dependencies[] = oauth_common
 dependencies[] = restws
 
 files[] = includes/dc_publisher.entity.inc
