@@ -214,7 +214,7 @@ function dc_publisher_menu() {
     'title' => 'Poster',
     'description' => 'Posting information from an outside services.',
     'access callback' => 'dc_publisher_oauth_allowed',
-    'page callback' => 'dc_publisher_post_information',
+    'page callback' => 'dc_publisher_receive_information',
   );
 
   $items['dc-connect'] = array(
@@ -437,7 +437,33 @@ function dc_publisher_oauth_allowed() {
 }
 
 /**
- * Page callback - supply the information the oauth service selected.
+ * Page callback; Receive the information and create entities.
+ */
+function dc_publisher_receive_information() {
+  $app = dc_apps_load_by_keys($_GET['key'], $_GET['secret']);
+
+  if (!$app) {
+    // No app found - return nothing.
+    drupal_json_output(t("App with the key and secret wasn't found"));
+  }
+
+  // The app is not defined to return this type of data.
+  if (!in_array($_GET['data'], array_keys($app->need))) {
+    drupal_json_output(t("The @data information you selected cannot be supplied due to app settings.", array('@data' => $_GET['data'])));
+    return;
+  }
+
+  // See if the app has the get method checked.
+  if ($app->supportMethod($_GET['data'], 'post')) {
+    drupal_json_output(t("The app don't support the get method."));
+    return;
+  }
+
+  // Process the sent data and create entities.
+}
+
+/**
+ * Page callback; Supply the information the oauth service selected.
  */
 function dc_publisher_supply_information() {
   $app = dc_apps_load_by_keys($_GET['key'], $_GET['secret']);
@@ -446,8 +472,6 @@ function dc_publisher_supply_information() {
     // No app found - return nothing.
     drupal_json_output(t("App with the key and secret wasn't found"));
   }
-
-  // See if the app has the get method checked.
 
   // Accessing via session. Get the session user information of that session.
   if (isset($_GET['session'])) {
@@ -466,14 +490,22 @@ function dc_publisher_supply_information() {
     $keys = array_keys($result['authorized_sessions']);
     $session = dc_publisher_authorized_sessions_load(reset($keys));
 
+    // Print out the user information.
     $session->getUserInfo(TRUE);
     return;
   }
 
+  // The app is not defined to return this type of data.
   if (!in_array($_GET['data'], array_keys($app->need))) {
     drupal_json_output(t("The @data information you selected cannot be supplied due to app settings.", array('@data' => $_GET['data'])));
+    return;
   }
 
+  // See if the app has the get method checked.
+  if ($app->supportMethod($_GET['data'], 'get')) {
+    drupal_json_output(t("The app don't support the get method."));
+    return;
+  }
 
   // Start the query.
   $query = new entityFieldQuery();
@@ -539,6 +571,8 @@ function dc_publisher_supply_information() {
   }
 
   // Declare variables.
+  // TODO: Move this to an api function so when return early we return HTTP
+  // response code and not just text.
   $info = array(
     'content' => array(),
     'meta_data' => array(),

@@ -154,4 +154,19 @@ class DrupalConnectApps extends Entity {
 
     return $this;
   }
+
+  /**
+   * Check if the app support a specific method.
+   *
+   * @param string $data
+   *  The entity type: node, user, comments etc. etc. etc.
+   * @param string $method
+   *  The method type: get, post.
+   *
+   * @return bool
+   *  True or false if the app support this type of method.
+   */
+  public function supportMethod($data, $method) {
+    return !empty($this->need[$data]['methods'][$method]);
+  }
 }
