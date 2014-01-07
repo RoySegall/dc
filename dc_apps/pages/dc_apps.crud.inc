@@ -72,6 +72,7 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
       '#default_value' => empty($need_info['search']) ? '' : $need_info['search'],
       '#states' => array(
         'visible' => array(
+          ':input[name="' . $name . '_need"]' => array('checked' => TRUE),
           ':input[name="' . $name . '_methods[get]"]' => array('checked' => TRUE),
         ),
       ),
@@ -88,6 +89,7 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
       ),
       '#states' => array(
         'visible' => array(
+          ':input[name="' . $name . '_need"]' => array('checked' => TRUE),
           ':input[name="' . $name . '_methods[get]"]' => array('checked' => TRUE),
         ),
       ),
@@ -222,7 +224,7 @@ function dc_apps_app_form_submit($form, &$form_state) {
   $need = array();
 
   foreach ($entities as $entity) {
-    if (!$values[$entity . '_need']) {
+    if (!isset($values[$entity . '_methods']) || !in_array(TRUE, $values[$entity . '_methods'])) {
       // We don't need to store information for not needed entities.
       continue;
     }
