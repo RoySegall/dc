@@ -455,7 +455,7 @@ function dc_publisher_receive_information() {
 
   // See if the app has the get method checked.
   if ($app->supportMethod($_GET['data'], 'post')) {
-    drupal_json_output(t("The app don't support the get method."));
+    drupal_json_output(t("The app don't support the post method."));
     return;
   }
 
