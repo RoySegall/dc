@@ -210,7 +210,6 @@ class DrupalConnectApps extends Entity {
  *    ->asset('node')
  *    ->propertyCondition('nid', 1)
  *    ->execute();
- *  dpm($result);
  * @encode
  */
 class DrupalConnectAppsQuery {
@@ -274,7 +273,7 @@ class DrupalConnectAppsQuery {
    *  An array of arguments to pass to the method.
    *
    * @throws Exception
-   * @return DrupalConnectAppsQuery;
+   * @return DrupalConnectAppsQuery
    */
   public function invokeEntityFieldQuery($method, $arguments) {
     if (!$this->asset) {
@@ -299,7 +298,8 @@ class DrupalConnectAppsQuery {
    *  The value of the property.
    * @param string $operator
    *  The operator. Set default to =.
-   * @return $this
+   *
+   * @return DrupalConnectAppsQuery
    */
   public function propertyCondition($property, $value, $operator = '=') {
     $this->invokeEntityFieldQuery('propertyCondition', array($property, $value, $operator));
@@ -307,13 +307,44 @@ class DrupalConnectAppsQuery {
     return $this;
   }
 
-  public function fieldCondition() {
-    // todo.
+  /**
+   * Adding condition by field.
+   *
+   * @param $field
+   *   Either a field name or a field array.
+   * @param $column
+   *   The column that should hold the value to be matched.
+   * @param $value
+   *   The value to test the column value against.
+   * @param $operator
+   *   The operator to be used to test the given value.
+   * @param $delta_group
+   *   An arbitrary identifier: conditions in the same group must have the same
+   *   $delta_group.
+   * @param $language_group
+   *   An arbitrary identifier: conditions in the same group must have the same
+   *   $language_group.
+   *
+   * @return DrupalConnectAppsQuery
+   */
+  public function fieldCondition($field, $column = NULL, $value = NULL, $operator = NULL, $delta_group = NULL, $language_group = NULL) {
+    $this->invokeEntityFieldQuery('fieldCondition', array($field, $column, $value, $operator, $delta_group, $language_group));
     return $this;
   }
 
-  public function range() {
-    // todo.
+  /**
+   * Restricts a query to a given range in the result set.
+   *
+   * @param $start
+   *   The first entity from the result set to return. If NULL, removes any
+   *   range directives that are set.
+   * @param $length
+   *   The number of entities to return from the result set.
+   *
+   * @return DrupalConnectAppsQuery
+   */
+  public function range($start, $length) {
+    $this->invokeEntityFieldQuery('range', array($start, $length));
     return $this;
   }
 
