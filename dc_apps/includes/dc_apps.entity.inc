@@ -234,6 +234,10 @@ class DrupalConnectAppsQuery {
    */
   protected $query;
 
+  /**
+   * @param DrupalConnectApps $app
+   *  The app fully loaded app.
+   */
   public function __construct(DrupalConnectApps $app) {
     $this->app = $app;
   }
@@ -275,7 +279,7 @@ class DrupalConnectAppsQuery {
    * @throws Exception
    * @return DrupalConnectAppsQuery
    */
-  public function invokeEntityFieldQuery($method, $arguments) {
+  public function invokeEntityFieldQuery($method, $arguments = array()) {
     if (!$this->asset) {
       throw new Exception(t('The class asset was not defined.'));
     }
@@ -311,19 +315,19 @@ class DrupalConnectAppsQuery {
    * Adding condition by field.
    *
    * @param $field
-   *   Either a field name or a field array.
+   *  Either a field name or a field array.
    * @param $column
-   *   The column that should hold the value to be matched.
+   *  The column that should hold the value to be matched.
    * @param $value
-   *   The value to test the column value against.
+   *  The value to test the column value against.
    * @param $operator
-   *   The operator to be used to test the given value.
+   *  The operator to be used to test the given value.
    * @param $delta_group
-   *   An arbitrary identifier: conditions in the same group must have the same
-   *   $delta_group.
+   *  An arbitrary identifier: conditions in the same group must have the same
+   *  $delta_group.
    * @param $language_group
-   *   An arbitrary identifier: conditions in the same group must have the same
-   *   $language_group.
+   *  An arbitrary identifier: conditions in the same group must have the same
+   *  $language_group.
    *
    * @return DrupalConnectAppsQuery
    */
@@ -336,10 +340,10 @@ class DrupalConnectAppsQuery {
    * Restricts a query to a given range in the result set.
    *
    * @param $start
-   *   The first entity from the result set to return. If NULL, removes any
-   *   range directives that are set.
+   *  The first entity from the result set to return. If NULL, removes and range
+   *  directives that are set.
    * @param $length
-   *   The number of entities to return from the result set.
+   *  The number of entities to return from the result set.
    *
    * @return DrupalConnectAppsQuery
    */
@@ -355,5 +359,22 @@ class DrupalConnectAppsQuery {
     $results = $this->query->execute();
 
     return empty($results[$this->asset]) ? '' : $results[$this->asset];
+  }
+
+  /**
+   * Return the number of the results we found.
+   *
+   * When we need to count the results number the developer clone the query and
+   * then execute the query with the count function. This method fire up the
+   * process and assert this to the passed variable.
+   *
+   * @param $data
+   *  A variable passed by reference in order to get the number of results.
+   */
+  public function count(&$data) {
+    $_cloned = clone $this;
+    $data = $_cloned
+      ->invokeEntityFieldQuery('count')
+      ->execute();
   }
 }
