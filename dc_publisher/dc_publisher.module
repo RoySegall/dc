@@ -508,15 +508,16 @@ function dc_publisher_supply_information() {
   }
 
   // Start the query.
-  $query = new entityFieldQuery();
-  $query->entityCondition('entity_type', $_GET['data']);
+  $query = $app
+    ->query()
+    ->asset($_GET['data']);
 
   // Check and verify if the is a session for asking a single user information.
   if (variable_get('apps_search_for_users_limit', FALSE) && $_GET['data'] == 'user') {
     // When searching for users and the checkbox was checked only users which
     // approve the app will be display in the search results.
     // Adding tag for altering query later on.
-    $query->addTag('dc_publisher_approved_apps');
+    $query->invokeEntityFieldQuery('addTag', array('dc_publisher_approved_apps'));
 
     // Adding the app id for the join.
     $query->addMetaData('app_id', $app->id);
@@ -525,7 +526,7 @@ function dc_publisher_supply_information() {
   // Find the field to work upon and the operator to apply.
   if (isset($_GET['search'])) {
     $info = $app->need[$_GET['data']];
-    $entity_info = entity_get_info($_GET['data']);
+    $entity_info = $app->entityInfo();
 
     // Check if the we looking for data in a field or in a property.
     if (in_array($info['search'], $entity_info['schema_fields_sql']['base table'])) {
@@ -555,10 +556,7 @@ function dc_publisher_supply_information() {
   $page = !empty($_GET['page']) ? $_GET['page'] * $result_number : 0;
 
   // Clone the query object so we could how much results we found.
-  $count_query = clone $query;
-  $result_count = $count_query
-    ->count()
-    ->execute();
+  $query->count($result_count);
 
   // Adding a batch.
   $query->range($page, $result_number);
@@ -566,7 +564,7 @@ function dc_publisher_supply_information() {
   // Execute.
   $result = $query->execute();
 
-  if (empty($result[$_GET['data']])) {
+  if (empty($result)) {
     drupal_json_output(t('No data were found according to you search curatorial.'));
   }
 
