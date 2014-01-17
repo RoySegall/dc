@@ -502,7 +502,7 @@ function dc_publisher_supply_information() {
   }
 
   // See if the app has the get method checked.
-  if ($app->supportMethod($_GET['data'], 'get')) {
+  if (!$app->supportMethod($_GET['data'], 'get')) {
     drupal_json_output(t("The app don't support the get method."));
     return;
   }
@@ -579,7 +579,7 @@ function dc_publisher_supply_information() {
   $format = restws_format('json');
 
   // Supply the information in batches.
-  foreach (array_keys($result[$_GET['data']]) as $id) {
+  foreach (array_keys($result) as $id) {
     // Un-serialized the data for building an array of results.
     $info['content'][] = drupal_json_decode($format->viewResource($resource, $id, TRUE));
   }

@@ -372,9 +372,9 @@ class DrupalConnectAppsQuery {
    *  A variable passed by reference in order to get the number of results.
    */
   public function count(&$data) {
-    $_cloned = clone $this;
-    $data = $_cloned
-      ->invokeEntityFieldQuery('count')
+    $query = clone $this->query;
+    $data = $query
+      ->count()
       ->execute();
   }
 }
