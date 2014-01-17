@@ -447,6 +447,7 @@ function dc_publisher_receive_information() {
     drupal_json_output(t("App with the key and secret wasn't found"));
   }
 
+
   // The app is not defined to return this type of data.
   if (!in_array($_GET['data'], array_keys($app->need))) {
     drupal_json_output(t("The @data information you selected cannot be supplied due to app settings.", array('@data' => $_GET['data'])));
@@ -454,7 +455,7 @@ function dc_publisher_receive_information() {
   }
 
   // See if the app has the get method checked.
-  if ($app->supportMethod($_GET['data'], 'post')) {
+  if (!$app->supportMethod($_GET['data'], 'post')) {
     drupal_json_output(t("The app don't support the post method."));
     return;
   }
@@ -1071,6 +1072,42 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
 
     $new_code = $code;
   }
+
+  // Display the poster interface.
+  $reader = new DrupalConnect($app->app_key, $app->app_secret);
+
+  $reader
+    ->SetUrl(dc_publisher_base_url('poster'))
+    ->SetOauthRequest()
+    ->SetSignatureParameter();
+
+  $reader->request->set_parameter('data', $type);
+
+  $code = '
+<?php
+  $reader = new DrupalConnect($app_key, $app_secret);
+  $reader
+    ->SetUrl($url)
+    ->SetOauthRequest(\'poster\')
+    ->SetSignatureParameter();
+  $reader->request->set_parameter(\'data\', $data_type);';
+
+  $url = l(t('Watch results'), $reader->getUrl());
+
+  $tabs[] = 'post';
+
+  $content .= theme('admin_app_documentation', array(
+    'title' => t('Post'),
+    'description' => t('Create entries for @asset', array('@asset' => $type)),
+    'url' => $url,
+    'tab_id' => 'post',
+    'code' => highlight_string($code, TRUE),
+    'raw_url' =>  $reader->getUrl(),
+    't' => array(
+      'code' => t('Code'),
+      'url' => t('URL'),
+    ),
+  ));
 
   // Add the tabs ID for the JS settings to apply the jQuery UI tabs effect.
   drupal_add_js(array('dc_publisher_tabs' => $tabs), 'setting');
