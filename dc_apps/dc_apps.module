@@ -333,6 +333,7 @@ function dc_apps_permission() {
  * @return DrupalConnectApps
  */
 function dc_apps_load_by_keys($key, $secret) {
+  // todo: Use static cache.
   $query = new entityFieldQuery();
 
   $result = $query

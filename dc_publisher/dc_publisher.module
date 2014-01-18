@@ -451,6 +451,58 @@ function dc_publisher_oauth_allowed() {
 }
 
 /**
+ * Page callback; Delete an entry in the DB.
+ */
+function dc_publisher_delete_information() {
+  $app = dc_apps_load_by_keys($_GET['key'], $_GET['secret']);
+
+  if (!$app) {
+    // No app found - return nothing.
+    drupal_json_output(t("App with the key and secret wasn't found"));
+  }
+
+  // The app is not defined to return this type of data.
+  if (!in_array($_GET['data'], array_keys($app->need))) {
+    drupal_json_output(t("The @data information you selected cannot be supplied due to app settings.", array('@data' => $_GET['data'])));
+    return;
+  }
+
+  // See if the app has the get method checked.
+  if (!$app->supportMethod($_GET['data'], 'delete')) {
+    drupal_json_output(t("The app don't support the post method."));
+    return;
+  }
+
+  // todo: Delete the entry.
+}
+
+/**
+ * Page callback; Update an entry in the DB.
+ */
+function dc_publisher_update_information() {
+  $app = dc_apps_load_by_keys($_GET['key'], $_GET['secret']);
+
+  if (!$app) {
+    // No app found - return nothing.
+    drupal_json_output(t("App with the key and secret wasn't found"));
+  }
+
+  // The app is not defined to return this type of data.
+  if (!in_array($_GET['data'], array_keys($app->need))) {
+    drupal_json_output(t("The @data information you selected cannot be supplied due to app settings.", array('@data' => $_GET['data'])));
+    return;
+  }
+
+  // See if the app has the get method checked.
+  if (!$app->supportMethod($_GET['data'], 'update')) {
+    drupal_json_output(t("The app don't support the update method."));
+    return;
+  }
+
+  // todo: Update the entry.
+}
+
+/**
  * Page callback; Receive the information and create entities.
  */
 function dc_publisher_receive_information() {

@@ -183,6 +183,19 @@ class DrupalConnectApps extends Entity {
   public function supportMethod($data, $method) {
     return !empty($this->need[$data]['methods'][$method]);
   }
+
+  /**
+   * Check if the app support a specific asset.
+   *
+   * @param $asset
+   *  The asset type: node, user, comment etc. etc.
+   *
+   * @return Bool
+   *  Return true/false weather the app support the requested asset.
+   */
+  public function supportAsset($asset) {
+    // todo: Complete the method.
+  }
 }
 
 /**
