@@ -333,20 +333,26 @@ function dc_apps_permission() {
  * @return DrupalConnectApps
  */
 function dc_apps_load_by_keys($key, $secret) {
-  // todo: Use static cache.
-  $query = new entityFieldQuery();
+  $info = &drupal_static(__FUNCTION__, array());
+  $static_identifier = $key . '_' . $secret;
 
-  $result = $query
-    ->entityCondition('entity_type', 'dc_app')
-    ->propertyCondition('app_key', $key)
-    ->propertyCondition('app_secret', $secret)
-    ->execute();
+  if (!empty($info[$static_identifier])) {
+    $return = $info[$static_identifier];
+  }
+  else {
+    $query = new entityFieldQuery();
 
-  if (empty($result['dc_app'])) {
-    return;
+    $result = $query
+      ->entityCondition('entity_type', 'dc_app')
+      ->propertyCondition('app_key', $key)
+      ->propertyCondition('app_secret', $secret)
+      ->execute();
+
+    $info[$static_identifier] = !empty($result['dc_app']) ? dc_apps_load(reset($result['dc_app'])->id) : '';
+    $return = $info[$static_identifier];
   }
 
-  return dc_apps_load(reset($result['dc_app'])->id);
+  return $return;
 }
 
 /**
