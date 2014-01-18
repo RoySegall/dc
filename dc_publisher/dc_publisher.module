@@ -486,8 +486,12 @@ function dc_publisher_receive_information() {
     $values[$field] = $value;
   }
 
-  $handler = restws_resource_controller($_GET['data']);
-  $handler->create($values);
+  $format = restws_format('json');
+  $handler =  restws_resource_controller($_GET['data']);
+  $id = $handler->create($values);
+
+  // Return the created entity.
+  drupal_json_output(drupal_json_decode($format->viewResource($handler, $id, TRUE)));
 }
 
 /**
