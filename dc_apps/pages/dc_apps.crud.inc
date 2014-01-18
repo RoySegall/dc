@@ -55,6 +55,7 @@ function dc_apps_app_form($form, &$form_state, DrupalConnectApps $app = NULL) {
         'get' => t('Get'),
         'post' => t('Post'),
         'delete' => t('Delete'),
+        'update' => t('Update'),
       ),
       '#attributes' => array('class' => array('container-inline')),
       '#default_value' => !empty($need_info['methods']) ? $need_info['methods'] : array(),

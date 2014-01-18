@@ -217,6 +217,20 @@ function dc_publisher_menu() {
     'page callback' => 'dc_publisher_receive_information',
   );
 
+  $items['updater'] = array(
+    'title' => 'Updater',
+    'description' => 'Update information from an outside services.',
+    'access callback' => 'dc_publisher_oauth_allowed',
+    'page callback' => 'dc_publisher_update_information',
+  );
+
+  $items['deleter'] = array(
+    'title' => 'Deleter',
+    'description' => 'Posting information from an outside services.',
+    'access callback' => 'dc_publisher_oauth_allowed',
+    'page callback' => 'dc_publisher_delete_information',
+  );
+
   $items['dc-connect'] = array(
     'title' => 'Connect',
     'description' => 'Create authorized sessions for pulling information of the user',
