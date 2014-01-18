@@ -447,7 +447,6 @@ function dc_publisher_receive_information() {
     drupal_json_output(t("App with the key and secret wasn't found"));
   }
 
-
   // The app is not defined to return this type of data.
   if (!in_array($_GET['data'], array_keys($app->need))) {
     drupal_json_output(t("The @data information you selected cannot be supplied due to app settings.", array('@data' => $_GET['data'])));
@@ -461,6 +460,20 @@ function dc_publisher_receive_information() {
   }
 
   // Process the sent data and create entities.
+  $input = file_get_contents("php://input");
+
+  if (!$input) {
+    drupal_json_output(t('Missing sent data.'));
+    return;
+  }
+
+  parse_str($input, $data);
+  foreach ($data as $field => $value) {
+    $values[$field] = $value;
+  }
+
+  $handler = restws_resource_controller($_GET['data']);
+  $handler->create($values);
 }
 
 /**
@@ -1007,7 +1020,7 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
     ->SetUrl($url)
     ->SetOauthRequest()
     ->SetSignatureParameter();
-  $reader->request->set_parameter(\'data\', $data_type);';
+  $reader->request->set_parameter(\'data\', \'' . $type . '\');';
 
   $information = array(
     array(
@@ -1090,7 +1103,7 @@ function dc_publisher_documentation_specific(DrupalConnectApps $app, $type) {
     ->SetUrl($url)
     ->SetOauthRequest(\'poster\')
     ->SetSignatureParameter();
-  $reader->request->set_parameter(\'data\', $data_type);';
+  $reader->request->set_parameter(\'data\', \'' . $type . '\');';
 
   $url = l(t('Watch results'), $reader->getUrl());
 
